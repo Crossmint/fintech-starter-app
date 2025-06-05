@@ -20,7 +20,7 @@
 - [Setup](#setup)
 - [Using another chain](#using-another-chain)
 - [Using in production](#using-in-production)
-   - [Enabling Withdrawals](#enabling-withdrawals)
+  - [Enabling Withdrawals](#enabling-withdrawals)
 
 ## Introduction
 
@@ -38,6 +38,7 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 - Leverage more than +200 onchain tools integrating [GOAT](https://github.com/goat-sdk/goat)
 
 **Coming soon**
+
 - Currency conversion
 - Earn interest on your USDC
 - Issue a debit card linked to your wallet
@@ -51,7 +52,6 @@ Join our [Telegram community](https://t.me/fintechstarterapp) to stay updated on
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCrossmint%2Ffintech-starter-app&env=NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY)
-
 
 ## Setup
 
@@ -114,7 +114,7 @@ NEXT_PUBLIC_CHAIN_ID=solana
 NEXT_PUBLIC_USDC_MINT=your_USDC_mint
 ```
 
-3. If using a network that is not EVM, update the `isValidAddress` function in `lib/utils.ts` to check the address format for the chain you want to use.
+3. If using a network that is not EVM or Solana, update the `isValidAddress` function in `lib/utils.ts` to check the address format for the chain you want to use.
 
 ## Using in production
 
@@ -127,8 +127,8 @@ This starter app is designed for rapid prototyping and testing in a staging envi
 4. Customize your email template for login and signup in the [Crossmint console](https://www.crossmint.com/console) under the Settings tab in the Branding section.
 5. For using onramp in production reach out to us on [Telegram](https://t.me/fintechstarterapp).
 
-
 ### Enabling Withdrawals
+
 Withdrawals are powered by [Coinbase](https://www.coinbase.com/en-es/developer-platform) and only work in production. For enabling withdrawals you'll need to:
 
 1. [Create a Coinbase developer account](https://www.coinbase.com/en-es/developer-platform)
