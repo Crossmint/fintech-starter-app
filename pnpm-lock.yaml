@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@crossmint/client-sdk-react-ui':
-        specifier: ~2.0.4
-        version: 2.0.4(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react-dom@19.1.2(@types/react@19.1.1))(@types/react@19.1.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.74.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react@19.1.1)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ~2.1.0
+        version: 2.1.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react-dom@19.1.2(@types/react@19.1.1))(@types/react@19.1.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.74.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react@19.1.1)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@heroicons/react':
         specifier: 2.0.18
         version: 2.0.18(react@19.1.0)
@@ -792,8 +792,8 @@ packages:
     peerDependencies:
       react: '>=17.0.2'
 
-  '@crossmint/client-sdk-react-ui@2.0.4':
-    resolution: {integrity: sha512-pZK237vTvoi6b9ukhvLWUbfoTkYHQvP8F1bzPwm5bfk7P4PVNjmFTIb6Wenbk13Dd789Dm45mTDcCyWYFh44UA==}
+  '@crossmint/client-sdk-react-ui@2.1.0':
+    resolution: {integrity: sha512-ER6gizfc5wh6zBU1G/GggfauolFsidxk5CPo6I+R+0Whbzh5N0RK9O3+G7nw9MBHiEHyMkowtGqIjL+vNxlOUQ==}
     peerDependencies:
       react: '>=17.0.2'
       react-dom: '>=17.0.2'
@@ -6438,7 +6438,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@crossmint/client-sdk-react-ui@2.0.4(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react-dom@19.1.2(@types/react@19.1.1))(@types/react@19.1.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.74.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react@19.1.1)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@crossmint/client-sdk-react-ui@2.1.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react-dom@19.1.2(@types/react@19.1.1))(@types/react@19.1.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.74.0(@babel/core@7.27.4)(@babel/preset-env@7.27.2(@babel/core@7.27.4))(@types/react@19.1.1)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@crossmint/client-sdk-auth': 1.2.12(@types/react@19.1.1)(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(utf-8-validate@5.0.10)(viem@2.23.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4))
       '@crossmint/client-sdk-base': 1.5.4
