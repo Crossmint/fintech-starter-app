@@ -38,7 +38,6 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 - Leverage more than +200 onchain tools integrating [GOAT](https://github.com/goat-sdk/goat)
 
 **Coming soon**
-
 - Currency conversion
 - Earn interest on your USDC
 - Issue a debit card linked to your wallet
@@ -52,6 +51,7 @@ Join our [Telegram community](https://t.me/fintechstarterapp) to stay updated on
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCrossmint%2Ffintech-starter-app&env=NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY)
+
 
 ## Setup
 
@@ -126,6 +126,7 @@ This starter app is designed for rapid prototyping and testing in a staging envi
 3. Update the USDC locator to the USDC of the mainnet chain you want to use.
 4. Customize your email template for login and signup in the [Crossmint console](https://www.crossmint.com/console) under the Settings tab in the Branding section.
 5. For using onramp in production reach out to us on [Telegram](https://t.me/fintechstarterapp).
+
 
 ### Enabling Withdrawals
 Withdrawals are powered by [Coinbase](https://www.coinbase.com/en-es/developer-platform) and only work in production. For enabling withdrawals you'll need to:
