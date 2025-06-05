@@ -20,7 +20,7 @@
 - [Setup](#setup)
 - [Using another chain](#using-another-chain)
 - [Using in production](#using-in-production)
-  - [Enabling Withdrawals](#enabling-withdrawals)
+- [Enabling Withdrawals](#enabling-withdrawals)
 
 ## Introduction
 
@@ -128,7 +128,6 @@ This starter app is designed for rapid prototyping and testing in a staging envi
 5. For using onramp in production reach out to us on [Telegram](https://t.me/fintechstarterapp).
 
 ### Enabling Withdrawals
-
 Withdrawals are powered by [Coinbase](https://www.coinbase.com/en-es/developer-platform) and only work in production. For enabling withdrawals you'll need to:
 
 1. [Create a Coinbase developer account](https://www.coinbase.com/en-es/developer-platform)
