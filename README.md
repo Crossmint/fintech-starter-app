@@ -79,7 +79,7 @@ bun install
 cp .env.template .env
 ```
 
-4. Login to the [Crossmint staging console](https://staging.crossmint.com/console) and get the client API key from the [overview page](https://staging.crossmint.com/console/overview):
+4. Login to the <a href="https://staging.crossmint.com/console" target="_blank">Crossmint staging console</a> and get the client API key from the <a href="https://staging.crossmint.com/console/overview" target="_blank">overview page</a>:
 
 ```env
 NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY=your_client_side_API_key
