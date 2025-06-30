@@ -26,7 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             showPasskeyHelpers={chain !== "solana"}
             createOnLogin={{
               chain: process.env.NEXT_PUBLIC_CHAIN_ID as any,
-              signer: { type: chain === "solana" ? "email" : "passkey" },
+              signer: { type: "email" },
             }}
           >
             {children}

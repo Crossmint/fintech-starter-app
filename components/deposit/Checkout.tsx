@@ -2,7 +2,6 @@ import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/clie
 import { useEffect } from "react";
 import { AmountBreakdown } from "./AmountBreakdown";
 import { cn } from "@/lib/utils";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
