@@ -12,9 +12,11 @@ import { WarningModal } from "./WarningModal";
 interface DashboardSummaryProps {
   onDepositClick: () => void;
   onSendClick: () => void;
+  onClaimPayClick?: () => void;
+  onCashOutClick?: () => void;
 }
 
-export function DashboardSummary({ onDepositClick, onSendClick }: DashboardSummaryProps) {
+export function DashboardSummary({ onDepositClick, onSendClick, onClaimPayClick, onCashOutClick }: DashboardSummaryProps) {
   const [showWalletDetails, setShowWalletDetails] = useState(false);
   const { wallet } = useWallet();
   const { user } = useAuth();
@@ -53,18 +55,42 @@ export function DashboardSummary({ onDepositClick, onSendClick }: DashboardSumma
   );
 
   return (
-    <Container className="flex w-full max-w-5xl flex-col items-center justify-between md:flex-row md:items-stretch">
+    <Container className="flex w-full max-w-5xl flex-col items-center justify-between gap-4 md:flex-row md:items-stretch">
       <WalletBalance />
-      <div className="flex w-full items-center gap-2 md:w-auto md:justify-end">
-        <DepositButton onClick={onDepositClick} />
-        <button
-          type="button"
-          className="bg-secondary hover:bg-secondary/80 text-secondary-foreground flex h-12 flex-grow items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition md:w-40"
-          onClick={onSendClick}
-        >
-          <Image src="/arrow-up-right-icon-white.svg" alt="Add" width={24} height={24} /> Send
-        </button>
-        <Dropdown trigger={dropdownTrigger} options={dropdownOptions} />
+      <div className="flex w-full flex-col gap-2 md:w-auto md:justify-end">
+        <div className="flex w-full items-center gap-2">
+          <DepositButton onClick={onDepositClick} />
+          <button
+            type="button"
+            className="bg-secondary hover:bg-secondary/80 text-secondary-foreground flex h-12 flex-grow items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition md:w-40"
+            onClick={onSendClick}
+          >
+            <Image src="/arrow-up-right-icon-white.svg" alt="Add" width={24} height={24} /> Send
+          </button>
+          <Dropdown trigger={dropdownTrigger} options={dropdownOptions} />
+        </div>
+        {(onClaimPayClick || onCashOutClick) && (
+          <div className="flex w-full items-center gap-2">
+            {onClaimPayClick && (
+              <button
+                type="button"
+                className="bg-blue-600 hover:bg-blue-700 flex h-12 flex-grow items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white transition md:flex-1"
+                onClick={onClaimPayClick}
+              >
+                💰 Claim Pay
+              </button>
+            )}
+            {onCashOutClick && (
+              <button
+                type="button"
+                className="bg-green-600 hover:bg-green-700 flex h-12 flex-grow items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white transition md:flex-1"
+                onClick={onCashOutClick}
+              >
+                💵 Cash Out
+              </button>
+            )}
+          </div>
+        )}
       </div>
       <WalletDetails onClose={() => setShowWalletDetails(false)} open={showWalletDetails} />
       <WarningModal open={openWarningModal} onClose={() => setOpenWarningModal(false)} />

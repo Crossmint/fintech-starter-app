@@ -2,6 +2,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { DepositModal } from "@/components/deposit";
 import { SendFundsModal } from "@/components/send-funds";
+import { ClaimPayModal } from "@/components/claim-pay";
+import { CashOutDemoModal } from "@/components/cash-out";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { useAuth } from "@crossmint/client-sdk-react-ui";
 import { NewProducts } from "./NewProducts";
@@ -14,7 +16,15 @@ interface MainScreenProps {
 export function MainScreen({ walletAddress }: MainScreenProps) {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [showClaimPayModal, setShowClaimPayModal] = useState(false);
+  const [showCashOutModal, setShowCashOutModal] = useState(false);
   const { logout } = useAuth();
+
+  const handleClaimSuccess = () => {
+  };
+
+  const handleCashOutSuccess = () => {
+  };
 
   return (
     <div className="flex h-full w-full items-center justify-center gap-2 px-3 py-8">
@@ -30,6 +40,8 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
         <DashboardSummary
           onDepositClick={() => setShowDepositModal(true)}
           onSendClick={() => setShowSendModal(true)}
+          onClaimPayClick={() => setShowClaimPayModal(true)}
+          onCashOutClick={() => setShowCashOutModal(true)}
         />
         <NewProducts />
         <ActivityFeed onDepositClick={() => setShowDepositModal(true)} />
@@ -39,6 +51,16 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
           walletAddress={walletAddress || ""}
         />
         <SendFundsModal open={showSendModal} onClose={() => setShowSendModal(false)} />
+        <ClaimPayModal
+          open={showClaimPayModal}
+          onClose={() => setShowClaimPayModal(false)}
+          onClaimSuccess={handleClaimSuccess}
+        />
+        <CashOutDemoModal
+          open={showCashOutModal}
+          onClose={() => setShowCashOutModal(false)}
+          onCashOutSuccess={handleCashOutSuccess}
+        />
       </div>
     </div>
   );
