@@ -145,33 +145,13 @@ export interface YieldActionsResponse {
   limit: number;
 }
 
-// Map Crossmint chain IDs to yield.xyz network names
-export function mapChainToYieldNetwork(chain: string): string | null {
-  const chainMap: Record<string, string> = {
-    // Mainnets
-    ethereum: "ethereum",
-    base: "base",
-    arbitrum: "arbitrum",
-    polygon: "polygon",
-    optimism: "optimism",
-    // Testnets (Crossmint uses these names in staging)
-    "ethereum-sepolia": "ethereum-sepolia",
-    "base-sepolia": "base-sepolia",
-    "optimism-sepolia": "optimism-sepolia",
-    "polygon-amoy": "polygon-amoy",
-    // Alternative naming conventions
-    sepolia: "ethereum-sepolia",
-  };
-
-  return chainMap[chain.toLowerCase()] || null;
-}
-
 const YIELD_API_BASE_URL = "https://api.yield.xyz";
+export const YIELD_CHAIN_NETWORK = "base";
 
 // Get an API key from https://yield.xyz
 const getApiKey = () => process.env.NEXT_PUBLIC_YIELD_API_KEY || "";
 
-async function fetchYields(network: string): Promise<YieldOpportunity[]> {
+async function fetchYields(): Promise<YieldOpportunity[]> {
   const apiKey = getApiKey();
 
   if (!apiKey) {
@@ -181,15 +161,9 @@ async function fetchYields(network: string): Promise<YieldOpportunity[]> {
     return [];
   }
 
-  const yieldNetwork = mapChainToYieldNetwork(network);
-  if (!yieldNetwork) {
-    console.warn(`Unsupported network for yield.xyz: ${network}`);
-    return [];
-  }
-
   try {
     const params = new URLSearchParams({
-      network: yieldNetwork,
+      network: YIELD_CHAIN_NETWORK,
       limit: "10",
       token: "USDC",
     });
@@ -327,7 +301,10 @@ export async function exitYield(
     body: JSON.stringify({
       yieldId,
       address,
-      arguments: amount ? { amount } : { useMaxAmount: true },
+      arguments: {
+        amount,
+        useMaxAmount: true,
+      },
     }),
   });
 
@@ -454,17 +431,17 @@ export function useYieldPositions(address: string | undefined) {
   };
 }
 
-export function useYields(network: string) {
+export function useYields() {
   const {
     data: yields = [],
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: ["yields", network],
-    queryFn: () => fetchYields(network),
+    queryKey: ["yields-testnet"],
+    queryFn: () => fetchYields(),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    enabled: !!network,
+    enabled: !!getApiKey(),
   });
 
   // Sort by APY descending

@@ -16,7 +16,7 @@ type Tab = "opportunities" | "positions";
 
 export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
   const { wallet } = useWallet();
-  const { yields, isLoading: yieldsLoading, error: yieldsError } = useYields("base");
+  const { yields, isLoading: yieldsLoading, error: yieldsError } = useYields();
   const {
     positions,
     positionCount,

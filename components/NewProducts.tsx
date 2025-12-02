@@ -53,7 +53,7 @@ const NewProduct = ({ title, description, image, onClick, isActive, badge }: New
 
 export function NewProducts({ onEarnYieldClick }: NewProductsProps) {
   const { wallet } = useWallet();
-  const { bestApy } = useYields("base");
+  const { bestApy } = useYields();
   const { positionCount } = useYieldPositions(wallet?.address);
 
   // Format APY for display
