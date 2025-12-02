@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { DepositModal } from "@/components/deposit";
 import { SendFundsModal } from "@/components/send-funds";
+import { EarnYieldModal } from "@/components/earn-yield";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { useAuth } from "@crossmint/client-sdk-react-ui";
 import { NewProducts } from "./NewProducts";
@@ -14,6 +15,7 @@ interface MainScreenProps {
 export function MainScreen({ walletAddress }: MainScreenProps) {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [showEarnYieldModal, setShowEarnYieldModal] = useState(false);
   const { logout } = useAuth();
 
   return (
@@ -31,7 +33,7 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
           onDepositClick={() => setShowDepositModal(true)}
           onSendClick={() => setShowSendModal(true)}
         />
-        <NewProducts />
+        <NewProducts onEarnYieldClick={() => setShowEarnYieldModal(true)} />
         <ActivityFeed onDepositClick={() => setShowDepositModal(true)} />
         <DepositModal
           open={showDepositModal}
@@ -39,6 +41,7 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
           walletAddress={walletAddress || ""}
         />
         <SendFundsModal open={showSendModal} onClose={() => setShowSendModal(false)} />
+        <EarnYieldModal open={showEarnYieldModal} onClose={() => setShowEarnYieldModal(false)} />
       </div>
     </div>
   );
