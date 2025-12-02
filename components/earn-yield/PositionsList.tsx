@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { YieldAction, YieldOpportunity, exitYield } from "@/hooks/useYields";
+import { YieldAction, YieldOpportunity, exitYield, getYieldBalance } from "@/hooks/useYields";
 import { EVMWallet, useWallet } from "@crossmint/client-sdk-react-ui";
 
 interface PositionsListProps {
@@ -69,15 +69,17 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
     setExitingId(position.id);
 
     try {
-      // Note: yield.xyz API expects human-readable amount
-      // Use position.amount (not amountRaw) for consistency
+      // Fetch current balance to pass to exit
+      const balance = await getYieldBalance(position.yieldId, wallet.address);
+
       console.log("[Yield] Starting exit:", {
         yieldId: position.yieldId,
         address: wallet.address,
+        balance,
       });
 
       // Get unsigned transactions for exit
-      const response = await exitYield(position.yieldId, wallet.address);
+      const response = await exitYield(position.yieldId, wallet.address, balance);
 
       console.log("[Yield] Got exit transactions:", response.transactions?.length || 0);
 

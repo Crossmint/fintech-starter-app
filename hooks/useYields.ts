@@ -278,14 +278,45 @@ export async function enterYield(
   return response.json();
 }
 
-export async function exitYield(yieldId: string, address: string): Promise<YieldActionResponse> {
+// Get balance for a yield position
+export async function getYieldBalance(yieldId: string, address: string): Promise<string> {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    return "0";
+  }
+
+  const response = await fetch(
+    `${YIELD_API_BASE_URL}/v1/yields/${yieldId}/balances?address=${address}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    return "0";
+  }
+
+  const data = await response.json();
+  const activeBalance = data.balances?.find((b: { type: string }) => b.type === "active");
+  return activeBalance?.amount || "0";
+}
+
+export async function exitYield(
+  yieldId: string,
+  address: string,
+  amount?: string
+): Promise<YieldActionResponse> {
   const apiKey = getApiKey();
 
   if (!apiKey) {
     throw new Error("Yield.xyz API key not configured");
   }
 
-  console.log("[Yield.xyz] Exiting yield:", { yieldId, address });
+  console.log("[Yield.xyz] Exiting yield:", { yieldId, address, amount });
 
   const response = await fetch(`${YIELD_API_BASE_URL}/v1/actions/exit`, {
     method: "POST",
@@ -296,7 +327,7 @@ export async function exitYield(yieldId: string, address: string): Promise<Yield
     body: JSON.stringify({
       yieldId,
       address,
-      arguments: { useMaxAmount: true },
+      arguments: amount ? { amount } : { useMaxAmount: true },
     }),
   });
 
