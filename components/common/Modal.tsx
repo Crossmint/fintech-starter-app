@@ -41,7 +41,7 @@ export function Modal({
           className
         )}
       >
-        <div className="relative flex h-9 w-full items-center justify-between">
+        <div className="relative flex h-9 w-full items-center justify-between gap-2">
           {showBackButton && (
             <button
               onClick={onBack || onClose}
@@ -53,8 +53,8 @@ export function Modal({
             </button>
           )}
           {title && (
-            <div className="transform-[translateX(-50%)] absolute left-1/2 w-max text-lg font-semibold">
-              {title}
+            <div className="flex flex-1">
+              <div className="text-lg font-semibold">{title}</div>
             </div>
           )}
           {showCloseButton && (
