@@ -37,10 +37,15 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 - Support for +40 chains (Solana, EVM, etc)
 - Leverage more than +200 onchain tools integrating [GOAT](https://github.com/goat-sdk/goat)
 
+**New: Yield Integration**
+
+- Earn yield on your USDC through DeFi protocols (Aave, Morpho, Compound)
+- Powered by [Yield.xyz](https://yield.xyz) - the unified yield infrastructure for Web3
+- The wallets in this demo use testnet tokens to interact with mainnet yield protocols. Testnet deposits won't actually earn yield — this is for demonstration purposes only.
+
 **Coming soon**
 
 - Currency conversion
-- Earn interest on your USDC
 - Issue a debit card linked to your wallet
 
 Get in touch with us to get early access to these features!
