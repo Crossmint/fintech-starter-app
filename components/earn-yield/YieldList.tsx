@@ -2,6 +2,7 @@ import React from "react";
 import { Info } from "lucide-react";
 import Image from "next/image";
 import { YieldOpportunity } from "@/hooks/useYields";
+import { cn } from "@/lib/utils";
 
 interface YieldListProps {
   yields: YieldOpportunity[];
@@ -96,13 +97,20 @@ export function YieldList({ yields, isLoading, error, onSelectYield }: YieldList
             key={yieldOpp.id}
             onClick={() => canEnter && onSelectYield(yieldOpp)}
             disabled={!canEnter}
-            className={`group w-full rounded-xl border border-gray-200 bg-white p-4 text-left transition ${
+            className={cn(
+              "group w-full rounded-xl border border-gray-200 bg-white p-4 text-left transition",
               canEnter ? "hover:border-primary/30 hover:shadow-md" : "cursor-not-allowed opacity-60"
-            }`}
+            )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Image src={"/usdc.svg"} alt={yieldOpp.metadata.name} width={36} height={36} />
+                <Image
+                  src={"/usdc.svg"}
+                  alt={yieldOpp.metadata.name}
+                  width={36}
+                  height={36}
+                  unoptimized
+                />
 
                 {/* Protocol Info */}
                 <div>

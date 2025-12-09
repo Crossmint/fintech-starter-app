@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Container } from "./common/Container";
 import { useYields, useYieldPositions } from "@/hooks/useYields";
+import { cn } from "@/lib/utils";
 
 interface NewProductProps {
   title: string;
@@ -21,14 +22,15 @@ const NewProduct = ({ title, description, image, onClick, isActive }: NewProduct
 
   return (
     <Container
-      className={`flex flex-1 items-center justify-between gap-3 py-4 ${
-        isClickable ? "hover:border-primary/30 cursor-pointer transition hover:shadow-md" : ""
-      }`}
+      className={cn(
+        "flex flex-1 items-center justify-between gap-3 py-4",
+        isClickable && "hover:border-primary/30 cursor-pointer transition hover:shadow-md"
+      )}
       onClick={isClickable ? onClick : undefined}
     >
       <div className="flex items-center gap-3">
         <div className="flex flex-col justify-center">
-          <Image className="w-fit" src={image} alt={title} width={40} height={40} />
+          <Image className="w-fit" src={image} alt={title} width={40} height={40} unoptimized />
         </div>
         <div className="flex flex-col">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">

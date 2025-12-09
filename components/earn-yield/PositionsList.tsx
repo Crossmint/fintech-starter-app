@@ -177,7 +177,13 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <Image src={"/usdc.svg"} alt={position.yieldId} width={36} height={36} />
+                <Image
+                  src={"/usdc.svg"}
+                  alt={position.yieldId}
+                  width={36}
+                  height={36}
+                  unoptimized
+                />
 
                 {/* Position info */}
                 <div>

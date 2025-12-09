@@ -145,13 +145,12 @@ export function Checkout({
   }, [amount, isAmountValid, receiptEmail, walletAddress, orderId, isCreatingOrder]);
 
   useEffect(() => {
-    if (order?.phase === "delivery") {
+    if (order?.phase === "payment") {
       onPaymentCompleted();
     }
-    // TODO fix
-    // if (order?.phase === "delivery") {
-    //   onProcessingPayment();
-    // }
+    if (order?.phase === "delivery") {
+      onProcessingPayment();
+    }
   }, [order, onPaymentCompleted, onProcessingPayment]);
 
   return (

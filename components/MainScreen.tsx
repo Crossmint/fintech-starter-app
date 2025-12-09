@@ -23,7 +23,7 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
       <div className="h-full w-full max-w-3xl">
         <div className="mb-4 flex h-12 w-full items-center justify-between px-1">
           <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Logo" width={44} height={44} />
+            <Image src="/logo.png" alt="Logo" width={44} height={44} priority />
             <div className="text-xl font-semibold text-gray-900">Dashboard</div>
           </div>
           <button onClick={logout} className="text-muted-foreground text-sm hover:text-gray-700">

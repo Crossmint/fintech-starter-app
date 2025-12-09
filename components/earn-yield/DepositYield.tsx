@@ -4,6 +4,7 @@ import { AmountInput } from "../common/AmountInput";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { useBalance } from "@/hooks/useBalance";
 import { YieldOpportunity, enterYield } from "@/hooks/useYields";
+import { cn } from "@/lib/utils";
 
 interface DepositYieldProps {
   yieldOpportunity: YieldOpportunity;
@@ -138,9 +139,10 @@ export function DepositYield({ yieldOpportunity, onSuccess, onProcessing }: Depo
       <div className="mb-4 flex w-full flex-col items-center">
         <AmountInput amount={amount} onChange={setAmount} />
         <div
-          className={`mt-1 text-sm ${
+          className={cn(
+            "mt-1 text-sm",
             Number(amount) > Number(displayableBalance) ? "text-red-600" : "text-gray-400"
-          }`}
+          )}
         >
           ${displayableBalance} available
         </div>
