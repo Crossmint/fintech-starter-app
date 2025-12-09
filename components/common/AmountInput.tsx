@@ -19,8 +19,8 @@ export function AmountInput({ amount, onChange }: AmountInputProps) {
 
   return (
     <input
-      placeholder="$0.00"
-      className="mb-1 w-full border-none text-center text-[54px] font-bold outline-none focus:ring-0"
+      placeholder="$0"
+      className="w-full border-none text-center text-5xl font-bold text-gray-900 outline-none focus:ring-0"
       value={amount ? `$${amount}` : ""}
       onChange={handleChange}
       style={{ maxWidth: 200 }}

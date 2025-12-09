@@ -2,7 +2,7 @@ import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/clie
 import { useEffect, useState } from "react";
 import { AmountBreakdown } from "./AmountBreakdown";
 import { cn } from "@/lib/utils";
-
+import { createOrder } from "@/server-actions/createOrder";
 
 // Get CSS variables
 const primaryColor =
@@ -84,13 +84,6 @@ const CHECKOUT_APPEARANCE = {
   },
 } as const;
 
-type CreateOrderResponse = {
-  order: {
-    orderId: string;
-  };
-  clientSecret: string;
-};
-
 type CheckoutProps = {
   amount: string;
   walletAddress: string;
@@ -117,36 +110,26 @@ export function Checkout({
   const [clientSecret, setClientSecret] = useState<string>("");
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string>("");
-  
-  console.log("order", order);
 
-  const createOrder = async () => {
+  const handleCreateOrder = async () => {
     if (!amount || !isAmountValid || !receiptEmail || !walletAddress) return;
-    
+
     setIsCreatingOrder(true);
     setOrderError("");
-    
+
     try {
-      const response = await fetch("/api/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount,
-          receiptEmail,
-          walletAddress,
-        }),
+      const result = await createOrder({
+        amount,
+        receiptEmail,
+        walletAddress,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create order");
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
-      const orderData = await response.json() as CreateOrderResponse;
-      setOrderId(orderData.order.orderId);
-      setClientSecret(orderData.clientSecret);
+      setOrderId(result.data.order.orderId);
+      setClientSecret(result.data.clientSecret);
     } catch (error) {
       console.error("Error creating order:", error);
       setOrderError(error instanceof Error ? error.message : "Failed to create order");
@@ -157,17 +140,18 @@ export function Checkout({
 
   useEffect(() => {
     if (amount && isAmountValid && receiptEmail && walletAddress && !orderId && !isCreatingOrder) {
-      createOrder();
+      handleCreateOrder();
     }
   }, [amount, isAmountValid, receiptEmail, walletAddress, orderId, isCreatingOrder]);
 
   useEffect(() => {
-    if (order?.phase === "completed") {
+    if (order?.phase === "delivery") {
       onPaymentCompleted();
     }
-    if (order?.phase === "delivery") {
-      onProcessingPayment();
-    }
+    // TODO fix
+    // if (order?.phase === "delivery") {
+    //   onProcessingPayment();
+    // }
   }, [order, onPaymentCompleted, onProcessingPayment]);
 
   return (
@@ -189,14 +173,14 @@ export function Checkout({
           {isCreatingOrder && (
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <div className="border-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
                 <p className="text-sm text-gray-600">Creating order...</p>
               </div>
             </div>
           )}
           {orderError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <p className="text-red-800 text-sm">{orderError}</p>
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+              <p className="text-sm text-red-800">{orderError}</p>
             </div>
           )}
           {orderId && clientSecret && !isCreatingOrder && (

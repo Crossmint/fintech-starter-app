@@ -1,4 +1,6 @@
 import { useWallet } from "@crossmint/client-sdk-react-ui";
+import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { Container } from "./common/Container";
 import { useYields, useYieldPositions } from "@/hooks/useYields";
 
@@ -8,45 +10,37 @@ interface NewProductProps {
   image: string;
   onClick?: () => void;
   isActive?: boolean;
-  badge?: React.ReactNode;
 }
 
 interface NewProductsProps {
   onEarnYieldClick?: () => void;
 }
 
-const NewProduct = ({ title, description, image, onClick, isActive, badge }: NewProductProps) => {
+const NewProduct = ({ title, description, image, onClick, isActive }: NewProductProps) => {
   const isClickable = isActive && onClick;
 
   return (
     <Container
-      className={`flex flex-1 justify-between ${
+      className={`flex flex-1 items-center justify-between gap-3 py-4 ${
         isClickable ? "hover:border-primary/30 cursor-pointer transition hover:shadow-md" : ""
       }`}
       onClick={isClickable ? onClick : undefined}
     >
-      <div className="flex flex-col gap-4 md:flex-row">
+      <div className="flex items-center gap-3">
         <div className="flex flex-col justify-center">
-          <img className="w-fit" src={image} alt={title} />
+          <Image className="w-fit" src={image} alt={title} width={40} height={40} />
         </div>
-        <div>
-          <div className="text-base font-semibold">{title}</div>
-          <div className="text-sm text-slate-500">{description}</div>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+            {title}
+            {!isActive && (
+              <span className="text-muted-foreground text-xs font-normal">Coming soon</span>
+            )}
+          </div>
+          <div className="text-muted-foreground text-sm">{description}</div>
         </div>
       </div>
-      <div className="flex flex-col items-end justify-start md:justify-center">
-        {badge ? (
-          badge
-        ) : isActive ? (
-          <div className="bg-primary/10 text-primary min-w-[92px] rounded-3xl px-2 py-1 text-center text-xs font-medium">
-            Available
-          </div>
-        ) : (
-          <div className="bg-muted text-muted-foreground min-w-[92px] rounded-3xl px-2 py-1 text-xs font-medium">
-            Coming soon
-          </div>
-        )}
-      </div>
+      {isClickable && <ChevronRight className="text-muted-foreground h-5 w-5 shrink-0" />}
     </Container>
   );
 };
@@ -59,43 +53,26 @@ export function NewProducts({ onEarnYieldClick }: NewProductsProps) {
   // Format APY for display
   const formatApy = (apy: number) => `${(apy * 100).toFixed(1)}%`;
 
-  // Build the badge based on position count
-  const getYieldBadge = () => {
-    if (positionCount > 0) {
-      return (
-        <div className="flex flex-col items-end gap-1">
-          <div className="flex items-center gap-1 rounded-3xl bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-green-500" />
-            {positionCount} Active
-          </div>
-          <div className="text-primary text-xs font-medium">Earning yield</div>
-        </div>
-      );
-    }
-    return null;
-  };
-
   const newProducts: (NewProductProps & { id: string })[] = [
     {
       id: "card",
       title: "Get your card",
       description: "Set up a card to start using your funds",
-      image: "/credit-card-pro.png",
+      image: "/credit-card-graphic.png",
       isActive: false,
     },
     {
       id: "earn-yield",
       title: "Earn yield",
       description: `Get up to ${formatApy(bestApy || 0.042)} APY on your USDC`,
-      image: "/earn-yield.png",
+      image: "/yield-graphic.png",
       onClick: onEarnYieldClick,
       isActive: true,
-      badge: getYieldBadge(),
     },
   ];
 
   return (
-    <div className="my-2 flex flex-col gap-2 md:flex-row">
+    <div className="mt-3 flex flex-col gap-3 md:flex-row">
       {newProducts.map((product) => (
         <NewProduct key={product.id} {...product} />
       ))}
