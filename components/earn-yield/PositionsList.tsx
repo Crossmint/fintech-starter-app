@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { YieldAction, YieldOpportunity, exitYield, getYieldBalance } from "@/hooks/useYields";
 import { EVMWallet, useWallet } from "@crossmint/client-sdk-react-ui";
+import Image from "next/image";
+import { YieldAction, YieldOpportunity, exitYield, getYieldBalance } from "@/hooks/useYields";
 
 interface PositionsListProps {
   positions: YieldAction[];
@@ -72,16 +73,8 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
       // Fetch current balance to pass to exit
       const balance = await getYieldBalance(position.yieldId, wallet.address);
 
-      console.log("[Yield] Starting exit:", {
-        yieldId: position.yieldId,
-        address: wallet.address,
-        balance,
-      });
-
       // Get unsigned transactions for exit
       const response = await exitYield(position.yieldId, wallet.address, balance);
-
-      console.log("[Yield] Got exit transactions:", response.transactions?.length || 0);
 
       // Sort transactions by stepIndex to ensure correct order
       const sortedTransactions = [...(response.transactions || [])].sort(
@@ -95,13 +88,6 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
         const tx = sortedTransactions[i];
         const unsignedTx = JSON.parse(tx.unsignedTransaction);
 
-        console.log(`[Yield] Executing exit transaction ${i + 1}/${sortedTransactions.length}:`, {
-          title: tx.title,
-          type: tx.type,
-          to: unsignedTx.to,
-          stepIndex: tx.stepIndex,
-        });
-
         // Send the transaction with all relevant parameters
         const txResult = await evmWallet.sendTransaction({
           to: unsignedTx.to,
@@ -110,15 +96,12 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
           ...(unsignedTx.gasLimit && { gas: unsignedTx.gasLimit }),
         });
 
-        console.log(`[Yield] Exit transaction ${i + 1} result:`, txResult);
-
         // Small delay between transactions
         if (i < sortedTransactions.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
 
-      console.log("[Yield] All exit transactions completed successfully");
       onExitSuccess();
     } catch (err: any) {
       console.error("[Yield] Exit error:", err);
@@ -194,10 +177,13 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                {/* Token logo */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500">
-                  <span className="text-lg font-bold text-white">$</span>
-                </div>
+                <Image
+                  src={"/usdc.svg"}
+                  alt={position.yieldId}
+                  width={36}
+                  height={36}
+                  unoptimized
+                />
 
                 {/* Position info */}
                 <div>

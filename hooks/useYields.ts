@@ -221,8 +221,6 @@ export async function enterYield(
     throw new Error("Yield.xyz API key not configured");
   }
 
-  console.log("[Yield.xyz] Entering yield:", { yieldId, address, amount });
-
   const response = await fetch(`${YIELD_API_BASE_URL}/v1/actions/enter`, {
     method: "POST",
     headers: {
@@ -290,8 +288,6 @@ export async function exitYield(
     throw new Error("Yield.xyz API key not configured");
   }
 
-  console.log("[Yield.xyz] Exiting yield:", { yieldId, address, amount });
-
   const response = await fetch(`${YIELD_API_BASE_URL}/v1/actions/exit`, {
     method: "POST",
     headers: {
@@ -340,8 +336,6 @@ export async function getUserYieldActions(address: string): Promise<YieldAction[
     });
 
     const url = `${YIELD_API_BASE_URL}/v1/actions?${params.toString()}`;
-    console.log("[Yield.xyz] Fetching user actions from:", url);
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -357,8 +351,6 @@ export async function getUserYieldActions(address: string): Promise<YieldAction[
     }
 
     const data: YieldActionsResponse = await response.json();
-    console.log("[Yield.xyz] User actions:", data.items?.length || 0, "positions found");
-
     return data.items || [];
   } catch (error) {
     console.error("[Yield.xyz] Error fetching user actions:", error);

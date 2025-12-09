@@ -6,8 +6,7 @@ import {
 } from "@crossmint/client-sdk-react-ui";
 import { Checkout } from "./Checkout";
 import { AmountInput } from "../common/AmountInput";
-import { Modal } from "../common/Modal";
-import { TestingCardModal } from "./TestingCardModal";
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
 import { useActivityFeed } from "../../hooks/useActivityFeed";
 import { cn } from "@/lib/utils";
 import { useBalance } from "@/hooks/useBalance";
@@ -20,6 +19,7 @@ interface DepositModalProps {
 
 const CLIENT_API_KEY_CONSOLE_FUND = process.env.NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY;
 
+const MIN_AMOUNT = 1; // Min amount in USD
 const MAX_AMOUNT = 50; // Max amount in USD allowed in staging
 
 export function DepositModal({ open, onClose, walletAddress }: DepositModalProps) {
@@ -50,23 +50,26 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
     setStep("processing");
   }, []);
 
+  const showCloseButton = step === "options";
+
   return (
-    <>
-      <Modal
-        open={open}
-        onClose={onClose}
-        showBackButton={step !== "processing"}
-        onBack={step === "options" ? handleDone : restartFlow}
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent
         className={cn(
-          "top-[70px] h-[calc(100dvh-174px)] md:max-h-[calc(100dvh-174px)] lg:top-0 lg:max-h-[calc(100dvh-32px)]",
-          amount && " lg:min-h-[718px]"
+          "flex h-fit max-h-[85vh] flex-col overflow-y-auto rounded-3xl bg-white sm:max-w-md",
+          amount && "min-h-[500px]"
         )}
-        title="Deposit"
       >
-        {open && step === "options" && <TestingCardModal />}
+        {showCloseButton && <DialogClose />}
+        <DialogTitle className="text-center">Deposit</DialogTitle>
         {step === "options" && (
           <div className="mb-6 flex w-full flex-col items-center">
             <AmountInput amount={amount} onChange={setAmount} />
+            {Number(amount) > 0 && Number(amount) < MIN_AMOUNT && (
+              <div className="mt-1 text-center text-red-600">
+                Minimum deposit amount is ${MIN_AMOUNT}
+              </div>
+            )}
             {Number(amount) > MAX_AMOUNT && (
               <div className="mt-1 text-center text-red-600">
                 Transaction amount exceeds the maximum allowed deposit limit of ${MAX_AMOUNT}
@@ -79,7 +82,7 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
             <CrossmintCheckoutProvider>
               <Checkout
                 amount={amount}
-                isAmountValid={Number(amount) <= MAX_AMOUNT && Number(amount) > 0}
+                isAmountValid={Number(amount) >= MIN_AMOUNT && Number(amount) <= MAX_AMOUNT}
                 walletAddress={walletAddress}
                 onPaymentCompleted={handlePaymentCompleted}
                 receiptEmail={receiptEmail || ""}
@@ -90,7 +93,7 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
             </CrossmintCheckoutProvider>
           </CrossmintProvider>
         </div>
-      </Modal>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

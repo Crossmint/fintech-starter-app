@@ -4,10 +4,10 @@ import { AmountInput } from "../common/AmountInput";
 import { OrderPreview } from "./OrderPreview";
 import { RecipientInput } from "./RecipientInput";
 import { useBalance } from "@/hooks/useBalance";
-import { Modal } from "../common/Modal";
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
 import { useActivityFeed } from "@/hooks/useActivityFeed";
-import { PrimaryButton } from "../common/PrimaryButton";
 import { isEmail, isValidAddress } from "@/lib/utils";
+import { ArrowLeft, X } from "lucide-react";
 
 interface SendFundsModalProps {
   open: boolean;
@@ -97,51 +97,65 @@ export function SendFundsModal({ open, onClose }: SendFundsModalProps) {
     onClose();
   };
 
-  const handleBack = () => {
-    if (!showPreview) {
-      handleDone();
-    } else {
-      resetFlow();
-    }
-  };
-
   const displayableAmount = Number(amount).toFixed(2);
+  const showBackButton = showPreview && !isLoading;
+  const showCloseButton = !showPreview;
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      showBackButton={!isLoading}
-      onBack={handleBack}
-      title={showPreview ? "Order Confirmation" : "Send"}
-    >
-      {!showPreview ? (
-        <>
-          <div className="mb-6 flex w-full flex-col items-center justify-between">
-            <AmountInput amount={amount} onChange={setAmount} />
-            <div
-              className={
-                Number(amount) > Number(displayableBalance) ? "text-red-600" : "text-gray-400"
-              }
-            >
-              $ {displayableBalance} balance
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleDone()}>
+      <DialogContent className="flex h-[580px] max-h-[85vh] flex-col rounded-3xl bg-white sm:max-w-md">
+        {showBackButton && (
+          <button
+            onClick={resetFlow}
+            className="absolute left-6 top-6 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+            aria-label="Back"
+            type="button"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+        )}
+        {showCloseButton && <DialogClose />}
+        <DialogTitle className="text-center">
+          {showPreview ? "Order Confirmation" : "Send"}
+        </DialogTitle>
+        {!showPreview ? (
+          <div className="flex w-full flex-1 flex-col">
+            <div className="mb-2 flex w-full flex-col items-center">
+              <AmountInput amount={amount} onChange={setAmount} />
+              <div
+                className={
+                  Number(amount) > Number(displayableBalance)
+                    ? "text-sm text-red-600"
+                    : "text-muted-foreground text-sm"
+                }
+              >
+                Current balance: ${displayableBalance}
+              </div>
+            </div>
+            <div className="mt-4 w-full">
+              <RecipientInput recipient={recipient} onChange={setRecipient} error={error} />
+            </div>
+            <div className="mt-auto w-full pt-8">
+              <button
+                disabled={!canContinue}
+                onClick={handleContinue}
+                className="bg-primary hover:bg-primary-hover w-full rounded-full px-6 py-3 text-sm font-medium text-white transition disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                Continue
+              </button>
             </div>
           </div>
-          <RecipientInput recipient={recipient} onChange={setRecipient} error={error} />
-          <PrimaryButton disabled={!canContinue} onClick={handleContinue}>
-            Continue
-          </PrimaryButton>
-        </>
-      ) : (
-        <OrderPreview
-          userEmail={user?.email || ""}
-          recipient={recipient}
-          amount={displayableAmount}
-          error={error}
-          isLoading={isLoading}
-          onConfirm={handleSend}
-        />
-      )}
-    </Modal>
+        ) : (
+          <OrderPreview
+            userEmail={user?.email || ""}
+            recipient={recipient}
+            amount={displayableAmount}
+            error={error}
+            isLoading={isLoading}
+            onConfirm={handleSend}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

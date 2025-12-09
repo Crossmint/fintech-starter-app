@@ -3,20 +3,21 @@
 
 :root {
   --radius: 0.625rem;
+  --background: #f5f5f5;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #30d55d;
+  --primary: #13B601;
   --primary-hover: #26a64b;
   --primary-foreground: oklch(100% 0 0);
   --secondary: #000000;
   --secondary-foreground: oklch(100% 0 0);
-  --muted: oklch(95.97% 0.011 196.98);
-  --muted-foreground: oklch(36.35% 0.063 215.72);
+  --muted: oklch(0.9702 0 0);
+  --muted-foreground: oklch(0.5544 0.0407 257.42);
   --accent: oklch(68.76% 0.1856 150.65);
-  --accent-foreground: oklch(60.29% 0 0);
+  --accent-foreground: oklch(0.9336 0.0058 264.53);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9288 0.013 255.51);
   --input: oklch(0.922 0 0);

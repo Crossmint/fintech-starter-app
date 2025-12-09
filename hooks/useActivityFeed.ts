@@ -6,7 +6,6 @@ export function useActivityFeed() {
   return useQuery({
     queryKey: ["walletActivity", wallet?.address],
     queryFn: async () => await wallet?.experimental_activity(),
-    initialData: { events: [] },
     enabled: !!wallet?.address,
   });
 }

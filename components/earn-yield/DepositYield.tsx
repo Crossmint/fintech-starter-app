@@ -4,6 +4,7 @@ import { AmountInput } from "../common/AmountInput";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { useBalance } from "@/hooks/useBalance";
 import { YieldOpportunity, enterYield } from "@/hooks/useYields";
+import { cn } from "@/lib/utils";
 
 interface DepositYieldProps {
   yieldOpportunity: YieldOpportunity;
@@ -50,19 +51,8 @@ export function DepositYield({ yieldOpportunity, onSuccess, onProcessing }: Depo
     onProcessing();
 
     try {
-      // Note: yield.xyz API expects human-readable amount (e.g., "3" for 3 USDC)
-      // NOT in smallest units/wei format
-      console.log("[Yield] Starting deposit:", {
-        yieldId: yieldOpportunity.id,
-        address: wallet.address,
-        amount: amount,
-      });
-
       // Get unsigned transactions from yield.xyz
       const response = await enterYield(yieldOpportunity.id, wallet.address, amount);
-
-      console.log("[Yield] Got transactions:", response.transactions?.length || 0);
-
       // Sort transactions by stepIndex to ensure correct order (APPROVAL before SUPPLY)
       const sortedTransactions = [...(response.transactions || [])].sort(
         (a: any, b: any) => (a.stepIndex || 0) - (b.stepIndex || 0)
@@ -75,13 +65,6 @@ export function DepositYield({ yieldOpportunity, onSuccess, onProcessing }: Depo
         const tx = sortedTransactions[i];
         const unsignedTx = JSON.parse(tx.unsignedTransaction);
 
-        console.log(`[Yield] Executing transaction ${i + 1}/${sortedTransactions.length}:`, {
-          title: tx.title,
-          type: tx.type,
-          to: unsignedTx.to,
-          stepIndex: tx.stepIndex,
-        });
-
         // Send the transaction with all relevant parameters
         const txResult = await evmWallet.sendTransaction({
           to: unsignedTx.to,
@@ -91,15 +74,11 @@ export function DepositYield({ yieldOpportunity, onSuccess, onProcessing }: Depo
           ...(unsignedTx.gasLimit && { gas: unsignedTx.gasLimit }),
         });
 
-        console.log(`[Yield] Transaction ${i + 1} result:`, txResult);
-
         // Small delay between transactions to allow state to update
         if (i < sortedTransactions.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
-
-      console.log("[Yield] All transactions completed successfully");
 
       // Refresh balance after successful deposit
       await refetchBalance();
@@ -160,9 +139,10 @@ export function DepositYield({ yieldOpportunity, onSuccess, onProcessing }: Depo
       <div className="mb-4 flex w-full flex-col items-center">
         <AmountInput amount={amount} onChange={setAmount} />
         <div
-          className={`mt-1 text-sm ${
+          className={cn(
+            "mt-1 text-sm",
             Number(amount) > Number(displayableBalance) ? "text-red-600" : "text-gray-400"
-          }`}
+          )}
         >
           ${displayableBalance} available
         </div>

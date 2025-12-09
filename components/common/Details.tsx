@@ -6,11 +6,11 @@ interface DetailsProps {
 
 export function Details({ values }: DetailsProps) {
   return (
-    <div className="mt-2.5 flex w-full flex-col gap-[18px] rounded-2xl bg-slate-50 p-4 text-base font-medium">
+    <div className="flex w-full flex-col gap-4 rounded-xl border border-gray-200 p-4">
       {values.map((value) => (
-        <div key={value.label} className="flex justify-between">
-          <div className="text-slate-500">{value.label}</div>
-          <div className="text-slate-700">{value.value}</div>
+        <div key={value.label} className="flex items-center justify-between text-sm">
+          <div className="text-gray-900">{value.label}</div>
+          <div className="font-medium text-gray-900">{value.value}</div>
         </div>
       ))}
     </div>
