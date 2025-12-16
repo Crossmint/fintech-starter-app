@@ -1,8 +1,7 @@
-import { useWallet } from "@crossmint/client-sdk-react-ui";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Container } from "./common/Container";
-import { useYields, useYieldPositions } from "@/hooks/useYields";
+import { useYields } from "@/hooks/useYields";
 import { cn } from "@/lib/utils";
 
 interface NewProductProps {
@@ -30,10 +29,17 @@ const NewProduct = ({ title, description, image, onClick, isActive }: NewProduct
     >
       <div className="flex items-center gap-3">
         <div className="flex flex-col justify-center">
-          <Image className="w-fit" src={image} alt={title} width={40} height={40} unoptimized />
+          <Image
+            className="h-fit w-12"
+            src={image}
+            alt={title}
+            width={48}
+            height={48}
+            unoptimized
+          />
         </div>
         <div className="flex flex-col">
-          <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+          <div className="text-md flex items-center gap-2 font-semibold text-gray-900">
             {title}
             {!isActive && (
               <span className="text-muted-foreground text-xs font-normal">Coming soon</span>
@@ -48,9 +54,7 @@ const NewProduct = ({ title, description, image, onClick, isActive }: NewProduct
 };
 
 export function NewProducts({ onEarnYieldClick }: NewProductsProps) {
-  const { wallet } = useWallet();
   const { bestApy } = useYields();
-  const { positionCount } = useYieldPositions(wallet?.address);
 
   // Format APY for display
   const formatApy = (apy: number) => `${(apy * 100).toFixed(1)}%`;
@@ -60,14 +64,14 @@ export function NewProducts({ onEarnYieldClick }: NewProductsProps) {
       id: "card",
       title: "Get your card",
       description: "Set up a card to start using your funds",
-      image: "/credit-card-graphic.png",
+      image: "/credit-card.png",
       isActive: false,
     },
     {
       id: "earn-yield",
       title: "Earn yield",
       description: `Get up to ${formatApy(bestApy || 0.042)} APY on your USDC`,
-      image: "/yield-graphic.png",
+      image: "/earn-yield.png",
       onClick: onEarnYieldClick,
       isActive: true,
     },

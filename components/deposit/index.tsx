@@ -8,7 +8,6 @@ import { Checkout } from "./Checkout";
 import { AmountInput } from "../common/AmountInput";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
 import { useActivityFeed } from "../../hooks/useActivityFeed";
-import { cn } from "@/lib/utils";
 import { useBalance } from "@/hooks/useBalance";
 
 interface DepositModalProps {
@@ -54,12 +53,7 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent
-        className={cn(
-          "flex h-fit max-h-[85vh] flex-col overflow-y-auto rounded-3xl bg-white sm:max-w-md",
-          amount && "min-h-[500px]"
-        )}
-      >
+      <DialogContent className="flex max-h-[85vh] min-h-[580px] flex-col overflow-y-auto rounded-3xl bg-white sm:max-w-md">
         {showCloseButton && <DialogClose />}
         <DialogTitle className="text-center">Deposit</DialogTitle>
         {step === "options" && (

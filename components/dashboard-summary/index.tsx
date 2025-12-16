@@ -79,7 +79,14 @@ export function DashboardSummary({ onDepositClick, onSendClick }: DashboardSumma
           <DialogTitle className="sr-only">Withdraw is not enabled</DialogTitle>
           <div className="flex w-full flex-1 flex-col items-center justify-center px-4">
             <div className="mb-6 flex items-center justify-center">
-              <Image src="/dollar-graphic.png" alt="Dollar" width={80} height={80} unoptimized />
+              <Image
+                src="/dollar.png"
+                className="h-fit w-20"
+                alt="Dollar"
+                width={80}
+                height={80}
+                unoptimized
+              />
             </div>
             <h2 className="mb-4 text-center text-2xl font-bold text-gray-900">
               Withdraw is not enabled

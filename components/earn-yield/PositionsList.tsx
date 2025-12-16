@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { EVMWallet, useWallet } from "@crossmint/client-sdk-react-ui";
 import Image from "next/image";
+import { Info } from "lucide-react";
 import { YieldAction, YieldOpportunity, exitYield, getYieldBalance } from "@/hooks/useYields";
 
 interface PositionsListProps {
@@ -151,12 +152,15 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
       {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
       {/* Testnet disclaimer */}
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-        <p className="text-xs text-amber-700">
-          ⚠️ <strong>Demo Mode:</strong> This wallet uses testnet tokens to interact with mainnet
-          yield protocols. Testnet deposits won&apos;t actually earn yield — this is for
-          demonstration purposes only.
-        </p>
+      <div className="rounded-xl bg-blue-50 p-4">
+        <div className="flex items-start gap-3">
+          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
+          <p className="text-xs text-blue-700">
+            <strong>Demo Mode:</strong> This wallet uses testnet tokens to interact with mainnet
+            yield protocols. Testnet deposits won&apos;t actually earn yield — this is for
+            demonstration purposes only.
+          </p>
+        </div>
       </div>
 
       {positions.map((position) => {
@@ -220,8 +224,11 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
               )}
             </div>
 
-            {/* Exit button */}
-            <div className="mt-3 flex justify-end">
+            {/* Exit button & Created date */}
+            <div className="mt-3 flex items-center justify-between">
+              <p className="self-end text-xs text-gray-400">
+                Enrolled {new Date(position.createdAt).toLocaleDateString()}
+              </p>
               <button
                 onClick={() => handleExit(position)}
                 disabled={isExiting}
@@ -230,11 +237,6 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
                 {isExiting ? "Exiting..." : "Exit Position"}
               </button>
             </div>
-
-            {/* Created date */}
-            <p className="mt-2 text-xs text-gray-400">
-              Enrolled {new Date(position.createdAt).toLocaleDateString()}
-            </p>
           </div>
         );
       })}

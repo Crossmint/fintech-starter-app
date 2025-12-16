@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useWallet } from "@crossmint/client-sdk-react-ui";
 import { Check, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
+import { ScrollArea } from "../common/ScrollArea";
 import { YieldList } from "./YieldList";
 import { DepositYield } from "./DepositYield";
 import { PositionsList } from "./PositionsList";
 import { useYields, useYieldPositions, YieldOpportunity } from "@/hooks/useYields";
+import { useActivityFeed } from "@/hooks/useActivityFeed";
 import { cn } from "@/lib/utils";
 
 interface EarnYieldModalProps {
@@ -25,6 +27,7 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
     isLoading: positionsLoading,
     refetch: refetchPositions,
   } = useYieldPositions(wallet?.address);
+  const { refetch: refetchActivityFeed } = useActivityFeed();
 
   const [step, setStep] = useState<Step>("list");
   const [activeTab, setActiveTab] = useState<Tab>("opportunities");
@@ -52,11 +55,13 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
 
   const handleExitSuccess = () => {
     refetchPositions();
+    refetchActivityFeed();
   };
 
   const handleDepositSuccess = () => {
     setStep("success");
     refetchPositions();
+    refetchActivityFeed();
   };
 
   const getTitle = () => {
@@ -91,7 +96,9 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
           </button>
         )}
         {showCloseButton && <DialogClose />}
-        <DialogTitle className="text-center">{getTitle()}</DialogTitle>
+        <DialogTitle className={cn("text-center", showBackButton && "px-10")}>
+          {getTitle()}
+        </DialogTitle>
 
         {step === "list" && (
           <div className="flex w-full flex-1 flex-col overflow-hidden">
@@ -127,7 +134,7 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
             </div>
 
             {/* Tab content */}
-            <div className="flex-1 overflow-y-auto">
+            <ScrollArea className="h-0 flex-1">
               {activeTab === "opportunities" && (
                 <YieldList
                   yields={yields}
@@ -147,7 +154,7 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
                   />
                 </div>
               )}
-            </div>
+            </ScrollArea>
           </div>
         )}
 

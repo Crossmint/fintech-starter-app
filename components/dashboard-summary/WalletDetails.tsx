@@ -23,7 +23,14 @@ export function WalletDetails({ onClose, open }: { onClose: () => void; open: bo
         <DialogTitle className="sr-only">Wallet Details</DialogTitle>
         <div className="flex w-full flex-1 flex-col items-center pt-4">
           <div className="mb-6 flex items-center justify-center">
-            <Image src="/wallet-graphic.png" alt="Wallet" width={80} height={80} unoptimized />
+            <Image
+              src="/wallet.png"
+              className="h-fit w-20"
+              alt="Wallet"
+              width={80}
+              height={80}
+              unoptimized
+            />
           </div>
           <h2 className="mb-6 text-center text-2xl font-bold text-gray-900">Wallet Details</h2>
           <Details

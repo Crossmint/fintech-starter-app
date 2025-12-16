@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useWallet } from "@crossmint/client-sdk-react-ui";
 import { ArrowUpRight, Plus, Percent, Ban } from "lucide-react";
 import { useActivityFeed } from "../hooks/useActivityFeed";
 import { Container } from "./common/Container";
+import { ScrollArea } from "./common/ScrollArea";
 import { cn } from "@/lib/utils";
+
+const PREVIEW_LIMIT = 8;
 
 // Helper to get icon based on event type
 const getActivityIcon = (eventType: string, isOutgoing: boolean) => {
@@ -25,10 +28,17 @@ const getActivityIcon = (eventType: string, isOutgoing: boolean) => {
 
 // Helper to format activity title
 const getActivityTitle = (eventType: string | undefined, isOutgoing: boolean) => {
+  if (eventType?.toLowerCase().includes("yield-enter")) return "Yield Deposit";
+  if (eventType?.toLowerCase().includes("yield-exit")) return "Yield Withdrawal";
   if (eventType?.toLowerCase().includes("yield")) return "Yield";
   if (eventType?.toLowerCase().includes("cancel")) return "Transfer canceled";
   if (eventType?.toLowerCase().includes("fail")) return "Transfer failed";
   return isOutgoing ? "Sent" : "Deposit";
+};
+
+// Check if event is yield-related
+const isYieldEvent = (eventType: string | undefined) => {
+  return eventType?.toLowerCase().includes("yield");
 };
 
 // Helper to format date
@@ -49,13 +59,36 @@ const formatActivityDate = (timestamp: number) => {
 
 export function ActivityFeed() {
   const { data, isLoading, error } = useActivityFeed();
-
   const { wallet } = useWallet();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Detect when user scrolls to the bottom of the preview
+  useEffect(() => {
+    if (!sentinelRef.current || isExpanded) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsExpanded(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [isExpanded, data?.events?.length]);
+
+  const events = data?.events || [];
+  const displayedEvents = isExpanded ? events : events.slice(0, PREVIEW_LIMIT);
+  const hasMoreEvents = events.length > PREVIEW_LIMIT;
+
   return (
-    <Container className="mt-3 flex h-[420px] w-full max-w-5xl flex-col">
+    <Container className="mt-3 flex h-[420px] w-full max-w-5xl flex-col overflow-hidden">
       <div className="mb-4 text-base font-semibold text-gray-900">Last activity</div>
-      <div className="flex w-full flex-1 flex-col items-center justify-start overflow-y-auto">
-        {!isLoading && !data?.events?.length && (
+      <ScrollArea className="h-0 flex-1">
+        {!isLoading && !events.length && (
           <div className="mt-6 flex flex-col items-center">
             <Image src="/activity-graphic.png" alt="No transactions" width={80} height={80} />
             <div className="mb-2 text-center font-semibold text-gray-900">No transactions yet</div>
@@ -70,26 +103,35 @@ export function ActivityFeed() {
           </div>
         )}
         {error && <div className="text-center text-red-500">{error.message}</div>}
-        {!isLoading && !error && data?.events?.length && data?.events?.length > 0 ? (
-          <ul className="flex w-full flex-col gap-4">
-            {data?.events.slice(0, 10).map((event) => {
+        {!isLoading && !error && displayedEvents.length > 0 ? (
+          <ul className="flex w-full flex-col gap-4 pr-4">
+            {displayedEvents.map((event, index) => {
               const isOutgoing = event.from_address.toLowerCase() === wallet?.address.toLowerCase();
               const isCanceledOrFailed =
                 event.type?.toLowerCase().includes("cancel") ||
                 event.type?.toLowerCase().includes("fail");
+              const isYield = isYieldEvent(event.type);
+              const isYieldEnter = event.type?.toLowerCase().includes("yield-enter");
+
+              // For yield events: enter = outgoing (depositing), exit = incoming (withdrawing)
+              const showAsOutgoing = isYield ? isYieldEnter : isOutgoing;
+
               return (
-                <li key={event.transaction_hash} className="flex items-center gap-4">
+                <li
+                  key={"index-" + index + "-" + event.timestamp.toString()}
+                  className="flex items-center gap-4"
+                >
                   <div
                     className={cn(
                       "flex h-12 w-12 items-center justify-center rounded-full",
                       isCanceledOrFailed ? "bg-gray-100" : "bg-green-50"
                     )}
                   >
-                    {getActivityIcon(event.type, isOutgoing)}
+                    {getActivityIcon(event.type, showAsOutgoing)}
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-gray-900">
-                      {getActivityTitle(event.type, isOutgoing)}
+                      {getActivityTitle(event.type, showAsOutgoing)}
                     </div>
                     <div className="text-muted-foreground text-sm">
                       {formatActivityDate(event.timestamp)}
@@ -101,12 +143,14 @@ export function ActivityFeed() {
                         "text-sm font-semibold",
                         isCanceledOrFailed
                           ? "text-gray-500"
-                          : isOutgoing
-                            ? "text-gray-900"
-                            : "text-primary"
+                          : isYield
+                            ? "text-primary"
+                            : showAsOutgoing
+                              ? "text-gray-900"
+                              : "text-primary"
                       )}
                     >
-                      {isOutgoing ? "-" : "+"}${Number(event.amount).toFixed(2)}
+                      {showAsOutgoing ? "-" : "+"}${Number(event.amount).toFixed(2)}
                     </div>
                     <div className="text-muted-foreground text-sm">
                       {event.token_symbol ? event.token_symbol : "USD"}
@@ -115,9 +159,13 @@ export function ActivityFeed() {
                 </li>
               );
             })}
+            {/* Sentinel element to detect scroll to bottom */}
+            {!isExpanded && hasMoreEvents && (
+              <div ref={sentinelRef} className="flex justify-center py-2" />
+            )}
           </ul>
         ) : null}
-      </div>
+      </ScrollArea>
     </Container>
   );
 }

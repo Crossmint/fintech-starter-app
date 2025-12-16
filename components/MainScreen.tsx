@@ -19,11 +19,19 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
   const { logout } = useAuth();
 
   return (
-    <div className="flex h-full w-full items-center justify-center gap-2 px-4 py-6">
-      <div className="h-full w-full max-w-3xl">
+    <div className="flex h-full w-full justify-center gap-2 px-4 py-6">
+      <div className="h-full w-full max-w-4xl">
         <div className="mb-4 flex h-12 w-full items-center justify-between px-1">
           <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Logo" width={44} height={44} priority />
+            <Image
+              src="/logo.png"
+              className="h-fit w-12"
+              alt="Logo"
+              width={48}
+              height={48}
+              priority
+              unoptimized
+            />
             <div className="text-xl font-semibold text-gray-900">Dashboard</div>
           </div>
           <button onClick={logout} className="text-muted-foreground text-sm hover:text-gray-700">

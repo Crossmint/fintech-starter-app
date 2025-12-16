@@ -3,14 +3,14 @@ import { HomeContent } from "@/app/home";
 
 export default function Home() {
   return (
-    <div className="grid h-screen items-center">
-      <main className="row-start-2 flex h-full flex-col items-center gap-8 sm:items-start">
+    <div className="flex h-screen flex-col py-3 sm:py-6 2xl:py-16">
+      <main className="flex flex-1 flex-col items-center sm:items-start">
         <HomeContent />
       </main>
-      <footer className="row-start-3 mb-4 flex flex-col items-center justify-center gap-4">
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      <footer className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-gray-500">
           <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+            className="flex items-center gap-2 transition-colors hover:text-gray-700 hover:underline hover:underline-offset-4"
             href="https://github.com/Crossmint/fintech-starter-app"
             target="_blank"
             rel="noopener noreferrer"
@@ -19,7 +19,7 @@ export default function Home() {
             View code
           </a>
           <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+            className="flex items-center gap-2 transition-colors hover:text-gray-700 hover:underline hover:underline-offset-4"
             href="https://crossmint.com/quickstarts"
             target="_blank"
             rel="noopener noreferrer"
@@ -28,7 +28,7 @@ export default function Home() {
             See all quickstarts
           </a>
           <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+            className="flex items-center gap-2 transition-colors hover:text-gray-700 hover:underline hover:underline-offset-4"
             href="https://crossmint.com"
             target="_blank"
             rel="noopener noreferrer"
