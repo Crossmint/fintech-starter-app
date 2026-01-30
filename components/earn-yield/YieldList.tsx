@@ -68,7 +68,7 @@ export function YieldList({ yields, isLoading, error, onSelectYield }: YieldList
   }
 
   return (
-    <div className="mt-4 flex w-full flex-col gap-3 pr-4">
+    <div className="mt-4 flex w-full flex-col gap-4 pr-4">
       {/* Info banner */}
       <div className="rounded-xl bg-blue-50 p-4">
         <div className="flex items-start gap-3">

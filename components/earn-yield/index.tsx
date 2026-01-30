@@ -125,11 +125,6 @@ export function EarnYieldModal({ open, onClose }: EarnYieldModalProps) {
                 )}
               >
                 My Positions
-                {positionCount > 0 && (
-                  <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-xl bg-green-500 text-xs text-white">
-                    {positionCount}
-                  </span>
-                )}
               </button>
             </div>
 

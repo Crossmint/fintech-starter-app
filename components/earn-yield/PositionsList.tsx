@@ -148,7 +148,7 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
   }
 
   return (
-    <div className="flex w-full flex-col gap-3">
+    <div className="flex w-full flex-col gap-4">
       {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
       {/* Testnet disclaimer */}
@@ -177,66 +177,51 @@ export function PositionsList({ positions, yields, isLoading, onExitSuccess }: P
         return (
           <div
             key={position.id}
-            className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-gray-200 bg-white p-4"
           >
-            <div className="flex items-start justify-between">
+            {/* Main content row */}
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Image
                   src={"/usdc.svg"}
                   alt={position.yieldId}
-                  width={36}
-                  height={36}
+                  width={40}
+                  height={40}
                   unoptimized
                 />
 
                 {/* Position info */}
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">
-                      {formatProviderName(position.yieldId)}
-                    </span>
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                      Earning
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-500">${displayAmount} USDC</p>
+                  <p className="font-semibold text-gray-900">
+                    ${displayAmount} USDC
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {formatProviderName(position.yieldId)}
+                  </p>
                 </div>
               </div>
 
-              {/* APY */}
-              {apy !== undefined && (
-                <div className="text-right">
-                  <div className="text-primary text-lg font-bold">{formatApy(apy)}</div>
-                  <div className="text-xs text-gray-500">APY</div>
-                </div>
-              )}
+              {/* Earnings & APY */}
+              <div className="text-right">
+                {estimatedYearlyEarnings && (
+                  <p className="font-semibold text-green-500">
+                    +${estimatedYearlyEarnings}/year
+                  </p>
+                )}
+                {apy !== undefined && (
+                  <p className="text-sm text-gray-400">{formatApy(apy)} APY</p>
+                )}
+              </div>
             </div>
 
-            {/* Earnings info */}
-            <div className="mt-3 rounded-lg bg-green-50 p-2">
-              {estimatedYearlyEarnings ? (
-                <p className="text-xs text-green-700">
-                  💰 Earning ~${estimatedYearlyEarnings} USDC/year at{" "}
-                  {apy ? formatApy(apy) : "current"} rate
-                </p>
-              ) : (
-                <p className="text-xs text-green-700">📈 Position active - earning yield</p>
-              )}
-            </div>
-
-            {/* Exit button & Created date */}
-            <div className="mt-3 flex items-center justify-between">
-              <p className="self-end text-xs text-gray-400">
-                Enrolled {new Date(position.createdAt).toLocaleDateString()}
-              </p>
-              <button
-                onClick={() => handleExit(position)}
-                disabled={isExiting}
-                className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isExiting ? "Exiting..." : "Exit Position"}
-              </button>
-            </div>
+            {/* Exit button */}
+            <button
+              onClick={() => handleExit(position)}
+              disabled={isExiting}
+              className="mt-4 w-full rounded-xl border border-gray-200 py-3 text-center text-sm font-medium text-gray-900 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isExiting ? "Exiting..." : "Exit position"}
+            </button>
           </div>
         );
       })}
