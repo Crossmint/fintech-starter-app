@@ -1,4 +1,4 @@
-import { useAuth, useWallet } from "@crossmint/client-sdk-react-ui";
+import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle } from "../common/Dialog";
 import { Details } from "../common/Details";
@@ -7,7 +7,7 @@ import { shortenAddress } from "@/utils/shortenAddress";
 
 export function WalletDetails({ onClose, open }: { onClose: () => void; open: boolean }) {
   const { wallet } = useWallet();
-  const { user } = useAuth();
+  const { user } = useCrossmintAuth();
 
   // Format chain name for display (e.g., "base-sepolia" -> "Base-Sepolia")
   const formatChainName = (chain: string) => {

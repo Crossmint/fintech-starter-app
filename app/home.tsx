@@ -2,12 +2,12 @@
 
 import { Login } from "@/components/Login";
 import { MainScreen } from "@/components/MainScreen";
-import { useAuth, useWallet } from "@crossmint/client-sdk-react-ui";
+import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import { useProcessWithdrawal } from "@/hooks/useProcessWithdrawal";
 
 export function HomeContent() {
   const { wallet, status: walletStatus } = useWallet();
-  const { status, status: authStatus, user } = useAuth();
+  const { status, status: authStatus, user } = useCrossmintAuth();
 
   useProcessWithdrawal(user?.id, wallet);
 

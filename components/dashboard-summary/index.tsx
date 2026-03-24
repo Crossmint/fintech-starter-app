@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "../common/DropdownMenu";
 import { WalletDetails } from "./WalletDetails";
-import { useWallet, useAuth } from "@crossmint/client-sdk-react-ui";
+import { useWallet, useCrossmintAuth } from "@crossmint/client-sdk-react-ui";
 
 interface DashboardSummaryProps {
   onDepositClick: () => void;
@@ -22,7 +22,7 @@ interface DashboardSummaryProps {
 export function DashboardSummary({ onDepositClick, onSendClick }: DashboardSummaryProps) {
   const [showWalletDetails, setShowWalletDetails] = useState(false);
   const { wallet } = useWallet();
-  const { user } = useAuth();
+  const { user } = useCrossmintAuth();
   const [openWarningModal, setOpenWarningModal] = useState(false);
 
   const handleWithdraw = () => {

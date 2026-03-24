@@ -32,7 +32,7 @@ export function useActivityFeed() {
   // Fetch wallet activity
   const walletActivityQuery = useQuery({
     queryKey: ["walletActivity", wallet?.address],
-    queryFn: async () => await wallet?.experimental_activity(),
+    queryFn: async () => await wallet?.transfers(),
     enabled: !!wallet?.address,
   });
 
@@ -46,7 +46,15 @@ export function useActivityFeed() {
 
   // Combine and sort events
   const combinedEvents = (() => {
-    const walletEvents: ActivityEvent[] = walletActivityQuery.data?.events || [];
+    // Map V1 transfers to ActivityEvent format
+    const walletEvents: ActivityEvent[] = (walletActivityQuery.data?.data || []).map((tx: any) => ({
+      from_address: tx.sender?.address || "",
+      to_address: tx.recipient?.address,
+      timestamp: new Date(tx.createdAt).getTime(),
+      type: tx.type || "",
+      amount: tx.token?.amount || "0",
+      token_symbol: tx.token?.symbol,
+    }));
 
     // Transform yield actions to activity events
     const yieldEvents: ActivityEvent[] = (yieldActionsQuery.data || []).map(
