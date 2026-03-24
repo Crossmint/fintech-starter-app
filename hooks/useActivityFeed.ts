@@ -32,7 +32,7 @@ export function useActivityFeed() {
   // Fetch wallet activity
   const walletActivityQuery = useQuery({
     queryKey: ["walletActivity", wallet?.address],
-    queryFn: async () => await wallet?.transfers(),
+    queryFn: async () => await wallet?.transfers({ tokens: "usdc", status: "successful" }),
     enabled: !!wallet?.address,
   });
 
