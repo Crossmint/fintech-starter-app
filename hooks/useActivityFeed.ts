@@ -50,7 +50,7 @@ export function useActivityFeed() {
     const walletEvents: ActivityEvent[] = (walletActivityQuery.data?.data || []).map((tx: any) => ({
       from_address: tx.sender?.address || "",
       to_address: tx.recipient?.address,
-      timestamp: new Date(tx.createdAt).getTime(),
+      timestamp: new Date(tx.completedAt).getTime(),
       type: tx.type || "",
       amount: tx.token?.amount || "0",
       token_symbol: tx.token?.symbol,
