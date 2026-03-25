@@ -35,7 +35,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
             createOnLogin={{
               chain,
               recovery: { type: "email" },
-              signers: [{ type: "device" }],
             }}
           >
             {children}
