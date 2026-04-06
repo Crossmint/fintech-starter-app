@@ -32,10 +32,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }
         >
           <CrossmintWalletProvider
-            showPasskeyHelpers={chain !== "solana"}
             createOnLogin={{
               chain,
-              signer: { type: "email" },
+              recovery: { type: "email" },
             }}
           >
             {children}

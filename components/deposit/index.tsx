@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import {
   CrossmintCheckoutProvider,
   CrossmintProvider,
-  useAuth,
+  useCrossmintAuth,
 } from "@crossmint/client-sdk-react-ui";
 import { Checkout } from "./Checkout";
 import { AmountInput } from "../common/AmountInput";
@@ -23,7 +23,7 @@ const MAX_AMOUNT = 50; // Max amount in USD allowed in staging
 
 export function DepositModal({ open, onClose, walletAddress }: DepositModalProps) {
   const [step, setStep] = useState<"options" | "processing" | "completed">("options");
-  const { user } = useAuth();
+  const { user } = useCrossmintAuth();
   const receiptEmail = user?.email;
   const [amount, setAmount] = useState("");
   const { refetch: refetchActivityFeed } = useActivityFeed();

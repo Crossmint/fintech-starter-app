@@ -32,7 +32,7 @@ export function useActivityFeed() {
   // Fetch wallet activity
   const walletActivityQuery = useQuery({
     queryKey: ["walletActivity", wallet?.address],
-    queryFn: async () => await wallet?.experimental_activity(),
+    queryFn: async () => await wallet?.transfers({ tokens: "usdc", status: "successful" }),
     enabled: !!wallet?.address,
   });
 
@@ -46,7 +46,27 @@ export function useActivityFeed() {
 
   // Combine and sort events
   const combinedEvents = (() => {
-    const walletEvents: ActivityEvent[] = walletActivityQuery.data?.events || [];
+    // Map V1 transfers to ActivityEvent format
+    const walletEvents: ActivityEvent[] = (walletActivityQuery.data?.data || []).map((tx: any) => {
+      const senderAddr = (tx.sender?.address || "").toLowerCase();
+      const recipientAddr = (tx.recipient?.address || "").toLowerCase();
+      const isSelfTransfer = senderAddr === recipientAddr;
+
+      // Differentiate onramp deposits (self-transfer) from received funds (external sender)
+      let type = tx.type || "";
+      if (type === "wallets.transfer.in" && isSelfTransfer) {
+        type = "wallets.deposit.onramp";
+      }
+
+      return {
+        from_address: tx.sender?.address || "",
+        to_address: tx.recipient?.address,
+        timestamp: new Date(tx.completedAt).getTime(),
+        type,
+        amount: tx.token?.amount || "0",
+        token_symbol: tx.token?.symbol,
+      };
+    });
 
     // Transform yield actions to activity events
     const yieldEvents: ActivityEvent[] = (yieldActionsQuery.data || []).map(

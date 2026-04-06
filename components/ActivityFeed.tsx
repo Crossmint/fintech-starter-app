@@ -33,7 +33,9 @@ const getActivityTitle = (eventType: string | undefined, isOutgoing: boolean) =>
   if (eventType?.toLowerCase().includes("yield")) return "Yield";
   if (eventType?.toLowerCase().includes("cancel")) return "Transfer canceled";
   if (eventType?.toLowerCase().includes("fail")) return "Transfer failed";
-  return isOutgoing ? "Sent" : "Deposit";
+  if (eventType === "wallets.deposit.onramp") return "Deposit";
+  if (eventType === "wallets.transfer.in") return "Received";
+  return isOutgoing ? "Sent" : "Received";
 };
 
 // Check if event is yield-related
