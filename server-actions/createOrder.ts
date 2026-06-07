@@ -2,7 +2,7 @@
 
 const CROSSMINT_SERVER_SIDE_API_KEY = process.env.CROSSMINT_SERVER_SIDE_API_KEY as string;
 const CROSSMINT_ENV = process.env.CROSSMINT_ENV || "staging";
-const USDC_LOCATOR = `${process.env.NEXT_PUBLIC_CHAIN_ID}:${process.env.NEXT_PUBLIC_USDC_MINT}:${process.env.NEXT_PUBLIC_USDC_MINT}`;
+const USDC_LOCATOR = `${process.env.NEXT_PUBLIC_CHAIN_ID}:${process.env.NEXT_PUBLIC_USDC_MINT}`;
 
 type CreateOrderParams = {
   amount: string;
@@ -61,10 +61,10 @@ export async function createOrder({
     });
 
     const data = await response.json();
-    if (!response.ok) {
+    if (!response.ok) {    
       return {
         success: false,
-        error: data?.error || "Failed to create order",
+        error: data?.message || "Failed to create order",
       };
     }
 
