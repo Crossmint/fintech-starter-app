@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const LOADING_TIMEOUT_MS = 5000;
-const ESTIMATED_FEE_RATE = 0.05; // ~5% estimated fee for sandbox display
+const ESTIMATED_FEE_PERCENT = 0.035; // ~3.5% variable fee
+const ESTIMATED_FEE_FIXED = 0.3; // ~$0.30 fixed processing fee
 
 interface BreakdownElementProps {
   label: string;
@@ -47,6 +48,7 @@ interface AmountBreakdownProps {
 export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBreakdownProps) {
   const [timedOut, setTimedOut] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasQuote = quote != null;
 
   const quoteAmount =
     quote?.totalPrice?.amount && isAmountValid ? Number.parseFloat(quote?.totalPrice?.amount) : 0;
@@ -55,7 +57,7 @@ export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBre
       ? Number.parseFloat(quote?.quantityRange?.upperBound)
       : 0;
 
-  const isWaitingForQuote = inputAmount !== quoteAmount && isAmountValid;
+  const isWaitingForQuote = hasQuote && inputAmount !== quoteAmount && isAmountValid;
 
   useEffect(() => {
     if (isWaitingForQuote) {
@@ -70,23 +72,18 @@ export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBre
     };
   }, [isWaitingForQuote, inputAmount]);
 
-  // Use quote values if available, otherwise fall back to estimates after timeout.
-  // In sandbox the quote may resolve but return zero fees (totalPrice == upperBound),
-  // which is unrealistic for a demo — apply estimated fees in that case too.
-  const useEstimates = timedOut && isWaitingForQuote;
+  // When no quote is provided (pre-confirmation), show estimates immediately.
+  // When quote exists but returns zero fees (sandbox: totalPrice == upperBound),
+  // also apply estimated fees since $0 fees is unrealistic for a demo.
+  const quoteTimedOut = timedOut && isWaitingForQuote;
   const quoteFees = quoteAmount ? quoteAmount - quoteTotal : 0;
   const hasRealisticFees = quoteFees > 0;
+  const shouldEstimate = !hasQuote || quoteTimedOut || (quoteAmount > 0 && !hasRealisticFees);
 
-  const amount = useEstimates ? inputAmount : quoteAmount;
-  const fees =
-    useEstimates || (quoteAmount > 0 && !hasRealisticFees)
-      ? inputAmount * ESTIMATED_FEE_RATE
-      : quoteFees;
-  const total =
-    useEstimates || (quoteAmount > 0 && !hasRealisticFees)
-      ? inputAmount * (1 - ESTIMATED_FEE_RATE)
-      : quoteTotal;
-  const showEstimateMarker = useEstimates || (quoteAmount > 0 && !hasRealisticFees);
+  const estimatedFees = inputAmount * ESTIMATED_FEE_PERCENT + ESTIMATED_FEE_FIXED;
+  const amount = shouldEstimate ? inputAmount : quoteAmount;
+  const fees = shouldEstimate ? estimatedFees : quoteFees;
+  const total = shouldEstimate ? inputAmount - estimatedFees : quoteTotal;
   const isLoading = isWaitingForQuote && !timedOut;
 
   return (
@@ -95,21 +92,21 @@ export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBre
         label="Amount"
         value={amount}
         isLoading={isLoading}
-        isEstimate={showEstimateMarker}
+        isEstimate={shouldEstimate}
       />
       <BreakdownElement
         label="Trans. Fees"
         value={fees}
         isLoading={isLoading}
-        isEstimate={showEstimateMarker}
+        isEstimate={shouldEstimate}
       />
       <BreakdownElement
         label="Total add to wallet"
         value={total}
         isLoading={isLoading}
-        isEstimate={showEstimateMarker}
+        isEstimate={shouldEstimate}
       />
-      {showEstimateMarker && (
+      {shouldEstimate && (
         <p className="text-xs text-gray-400">
           Estimated values — final amount determined at checkout
         </p>

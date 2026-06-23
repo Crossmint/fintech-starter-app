@@ -5,6 +5,7 @@ import {
   useCrossmintAuth,
 } from "@crossmint/client-sdk-react-ui";
 import { Checkout } from "./Checkout";
+import { AmountBreakdown } from "./AmountBreakdown";
 import { AmountInput } from "../common/AmountInput";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
 import { useActivityFeed } from "../../hooks/useActivityFeed";
@@ -76,7 +77,7 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
         {showCloseButton && <DialogClose />}
         <DialogTitle className="text-center">{titleText}</DialogTitle>
         {step === "options" && !hasConfirmedAmount && (
-          <div className="mb-6 flex w-full flex-col items-center">
+          <div className="mb-6 flex w-full flex-col items-center gap-4">
             <AmountInput amount={amount} onChange={setAmount} />
             {Number(amount) > 0 && Number(amount) < MIN_AMOUNT && (
               <div className="mt-1 text-center text-red-600">
@@ -89,13 +90,16 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
               </div>
             )}
             {isAmountValid && (
-              <button
-                type="button"
-                onClick={handleAmountConfirm}
-                className="bg-primary hover:bg-primary-hover text-primary-foreground mt-4 w-full rounded-full px-6 py-3 text-sm font-medium transition"
-              >
-                Continue with ${amount}
-              </button>
+              <>
+                <AmountBreakdown inputAmount={Number(amount)} isAmountValid={isAmountValid} />
+                <button
+                  type="button"
+                  onClick={handleAmountConfirm}
+                  className="bg-primary hover:bg-primary-hover text-primary-foreground w-full rounded-full px-6 py-3 text-sm font-medium transition"
+                >
+                  Continue with ${amount}
+                </button>
+              </>
             )}
           </div>
         )}

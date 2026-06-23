@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/client-sdk-react-ui";
-import { CreditCard, Info } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { AmountBreakdown } from "./AmountBreakdown";
 import { cn } from "@/lib/utils";
 import { createOrder } from "@/server-actions/createOrder";
@@ -212,15 +212,6 @@ export function Checkout({
           )}
           {orderId && clientSecret && !isCreatingOrder && (
             <div className="flex flex-col gap-3">
-              {/* Sandbox environment notice */}
-              {step === "options" && (
-                <div className="flex items-start gap-2 rounded-lg border border-amber-100 bg-amber-50/50 px-3 py-2">
-                  <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
-                  <span className="text-xs leading-relaxed text-amber-700">
-                    Sandbox mode — verification prompts can be skipped by selecting the pass option.
-                  </span>
-                </div>
-              )}
               {/* Test card info - only show when payment card input is relevant */}
               {shouldShowCardHelper && (
                 <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
