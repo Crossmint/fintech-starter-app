@@ -103,6 +103,9 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
             )}
           </div>
         )}
+        {step === "options" && hasConfirmedAmount && (
+          <AmountBreakdown inputAmount={Number(confirmedAmount)} isAmountValid={true} />
+        )}
         <div className="flex w-full flex-grow flex-col">
           <CrossmintProvider apiKey={CLIENT_API_KEY_CONSOLE_FUND as string}>
             <CrossmintCheckoutProvider>

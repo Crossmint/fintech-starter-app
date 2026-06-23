@@ -1,10 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/client-sdk-react-ui";
-import { CreditCard } from "lucide-react";
-import { AmountBreakdown } from "./AmountBreakdown";
 import { cn } from "@/lib/utils";
 import { createOrder } from "@/server-actions/createOrder";
-import { CopyWrapper } from "../common/CopyWrapper";
 
 // Get CSS variables
 const primaryColor =
@@ -113,8 +110,6 @@ export function Checkout({
   const [clientSecret, setClientSecret] = useState<string>("");
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string>("");
-  const [showCardHelper, setShowCardHelper] = useState(true);
-  const [checkoutPhase, setCheckoutPhase] = useState<string>("");
   const orderAmountRef = useRef<string>("");
 
   const handleCreateOrder = async () => {
@@ -158,28 +153,7 @@ export function Checkout({
     if (order?.phase === "delivery") {
       onProcessingPayment();
     }
-    if (order?.phase) {
-      setCheckoutPhase(order.phase);
-    }
   }, [order, onPaymentCompleted, onProcessingPayment]);
-
-  // Listen for postMessage events from the embedded checkout to detect payment step
-  const handleMessage = useCallback((event: MessageEvent) => {
-    if (event.data?.type === "crossmint:checkout:stepChange") {
-      const currentStep = event.data?.step || "";
-      // Only show card helper on payment-related steps
-      setShowCardHelper(currentStep === "payment" || currentStep === "card");
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [handleMessage]);
-
-  // Determine if we should show the test card hint
-  const isPaymentStep = checkoutPhase === "payment" || checkoutPhase === "";
-  const shouldShowCardHelper = step === "options" && showCardHelper && isPaymentStep;
 
   return (
     <div
@@ -188,13 +162,6 @@ export function Checkout({
         step !== "options" && "flex items-center justify-center"
       )}
     >
-      {step === "options" && (
-        <AmountBreakdown
-          quote={order?.lineItems[0].quote}
-          inputAmount={amount ? Number.parseFloat(amount) : 0}
-          isAmountValid={isAmountValid}
-        />
-      )}
       {amount && isAmountValid && (
         <div>
           {isCreatingOrder && (
@@ -212,18 +179,6 @@ export function Checkout({
           )}
           {orderId && clientSecret && !isCreatingOrder && (
             <div className="flex flex-col gap-3">
-              {/* Test card info - only show when payment card input is relevant */}
-              {shouldShowCardHelper && (
-                <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
-                  <CreditCard className="h-4 w-4 flex-shrink-0 text-gray-500" />
-                  <span className="text-xs text-gray-600">Test card:</span>
-                  <code className="text-xs font-medium text-gray-800">4242 4242 4242 4242</code>
-                  <CopyWrapper
-                    toCopy="4242424242424242"
-                    className="ml-auto text-xs text-gray-500 hover:text-gray-700"
-                  />
-                </div>
-              )}
               <div className="checkout-container overflow-hidden rounded-xl">
                 <CrossmintEmbeddedCheckout
                   orderId={orderId}
