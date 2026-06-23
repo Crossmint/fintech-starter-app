@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/client-sdk-react-ui";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Info } from "lucide-react";
 import { AmountBreakdown } from "./AmountBreakdown";
 import { cn } from "@/lib/utils";
 import { createOrder } from "@/server-actions/createOrder";
@@ -58,6 +58,7 @@ const CHECKOUT_APPEARANCE = {
       font: {
         family: "Inter, sans-serif",
       },
+      borderRadius: "9999px",
       colors: {
         background: primaryColor,
       },
@@ -112,6 +113,9 @@ export function Checkout({
   const [clientSecret, setClientSecret] = useState<string>("");
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string>("");
+  const [showCardHelper, setShowCardHelper] = useState(true);
+  const [checkoutPhase, setCheckoutPhase] = useState<string>("");
+  const orderAmountRef = useRef<string>("");
 
   const handleCreateOrder = async () => {
     if (!amount || !isAmountValid || !receiptEmail || !walletAddress) return;
@@ -132,6 +136,7 @@ export function Checkout({
 
       setOrderId(result.data.order.orderId);
       setClientSecret(result.data.clientSecret);
+      orderAmountRef.current = amount;
     } catch (error) {
       console.error("Error creating order:", error);
       setOrderError(error instanceof Error ? error.message : "Failed to create order");
@@ -153,7 +158,28 @@ export function Checkout({
     if (order?.phase === "delivery") {
       onProcessingPayment();
     }
+    if (order?.phase) {
+      setCheckoutPhase(order.phase);
+    }
   }, [order, onPaymentCompleted, onProcessingPayment]);
+
+  // Listen for postMessage events from the embedded checkout to detect payment step
+  const handleMessage = useCallback((event: MessageEvent) => {
+    if (event.data?.type === "crossmint:checkout:stepChange") {
+      const currentStep = event.data?.step || "";
+      // Only show card helper on payment-related steps
+      setShowCardHelper(currentStep === "payment" || currentStep === "card");
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [handleMessage]);
+
+  // Determine if we should show the test card hint
+  const isPaymentStep = checkoutPhase === "payment" || checkoutPhase === "";
+  const shouldShowCardHelper = step === "options" && showCardHelper && isPaymentStep;
 
   return (
     <div
@@ -185,10 +211,19 @@ export function Checkout({
             </div>
           )}
           {orderId && clientSecret && !isCreatingOrder && (
-            <div>
-              {/* Test card info - hide when processing */}
+            <div className="flex flex-col gap-3">
+              {/* Sandbox environment notice */}
               {step === "options" && (
-                <div className="mb-4 flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
+                <div className="flex items-start gap-2 rounded-lg border border-amber-100 bg-amber-50/50 px-3 py-2">
+                  <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+                  <span className="text-xs leading-relaxed text-amber-700">
+                    Sandbox mode — verification prompts can be skipped by selecting the pass option.
+                  </span>
+                </div>
+              )}
+              {/* Test card info - only show when payment card input is relevant */}
+              {shouldShowCardHelper && (
+                <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
                   <CreditCard className="h-4 w-4 flex-shrink-0 text-gray-500" />
                   <span className="text-xs text-gray-600">Test card:</span>
                   <code className="text-xs font-medium text-gray-800">4242 4242 4242 4242</code>
@@ -198,18 +233,20 @@ export function Checkout({
                   />
                 </div>
               )}
-              <CrossmintEmbeddedCheckout
-                orderId={orderId}
-                // @ts-ignore
-                clientSecret={clientSecret}
-                payment={{
-                  receiptEmail,
-                  crypto: { enabled: false },
-                  fiat: { enabled: true },
-                  defaultMethod: "fiat",
-                }}
-                appearance={CHECKOUT_APPEARANCE}
-              />
+              <div className="checkout-container overflow-hidden rounded-xl">
+                <CrossmintEmbeddedCheckout
+                  orderId={orderId}
+                  // @ts-ignore
+                  clientSecret={clientSecret}
+                  payment={{
+                    receiptEmail,
+                    crypto: { enabled: false },
+                    fiat: { enabled: true },
+                    defaultMethod: "fiat",
+                  }}
+                  appearance={CHECKOUT_APPEARANCE}
+                />
+              </div>
             </div>
           )}
         </div>
