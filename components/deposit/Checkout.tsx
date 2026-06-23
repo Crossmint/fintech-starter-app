@@ -181,8 +181,7 @@ export function Checkout({
           )}
           {orderId && clientSecret && !isCreatingOrder && (
             <div className="flex flex-col gap-3">
-              {/* Show test card only once KYC is done and checkout reaches the payment phase */}
-              {order?.phase === "payment" && step === "options" && (
+              {step === "options" && (
                 <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
                   <CreditCard className="h-4 w-4 flex-shrink-0 text-gray-500" />
                   <span className="text-xs text-gray-600">Test card:</span>
