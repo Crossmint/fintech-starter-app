@@ -70,15 +70,23 @@ export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBre
     };
   }, [isWaitingForQuote, inputAmount]);
 
-  // Use quote values if available, otherwise fall back to estimates after timeout
+  // Use quote values if available, otherwise fall back to estimates after timeout.
+  // In sandbox the quote may resolve but return zero fees (totalPrice == upperBound),
+  // which is unrealistic for a demo — apply estimated fees in that case too.
   const useEstimates = timedOut && isWaitingForQuote;
+  const quoteFees = quoteAmount ? quoteAmount - quoteTotal : 0;
+  const hasRealisticFees = quoteFees > 0;
+
   const amount = useEstimates ? inputAmount : quoteAmount;
-  const fees = useEstimates
-    ? inputAmount * ESTIMATED_FEE_RATE
-    : quoteAmount
-      ? quoteAmount - quoteTotal
-      : 0;
-  const total = useEstimates ? inputAmount * (1 - ESTIMATED_FEE_RATE) : quoteTotal;
+  const fees =
+    useEstimates || (quoteAmount > 0 && !hasRealisticFees)
+      ? inputAmount * ESTIMATED_FEE_RATE
+      : quoteFees;
+  const total =
+    useEstimates || (quoteAmount > 0 && !hasRealisticFees)
+      ? inputAmount * (1 - ESTIMATED_FEE_RATE)
+      : quoteTotal;
+  const showEstimateMarker = useEstimates || (quoteAmount > 0 && !hasRealisticFees);
   const isLoading = isWaitingForQuote && !timedOut;
 
   return (
@@ -87,21 +95,21 @@ export function AmountBreakdown({ quote, inputAmount, isAmountValid }: AmountBre
         label="Amount"
         value={amount}
         isLoading={isLoading}
-        isEstimate={useEstimates}
+        isEstimate={showEstimateMarker}
       />
       <BreakdownElement
         label="Trans. Fees"
         value={fees}
         isLoading={isLoading}
-        isEstimate={useEstimates}
+        isEstimate={showEstimateMarker}
       />
       <BreakdownElement
         label="Total add to wallet"
         value={total}
         isLoading={isLoading}
-        isEstimate={useEstimates}
+        isEstimate={showEstimateMarker}
       />
-      {useEstimates && (
+      {showEstimateMarker && (
         <p className="text-xs text-gray-400">
           Estimated values — final amount determined at checkout
         </p>
