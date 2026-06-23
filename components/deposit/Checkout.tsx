@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/client-sdk-react-ui";
+import { CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createOrder } from "@/server-actions/createOrder";
+import { CopyWrapper } from "../common/CopyWrapper";
 
 // Get CSS variables
 const primaryColor =
@@ -179,6 +181,18 @@ export function Checkout({
           )}
           {orderId && clientSecret && !isCreatingOrder && (
             <div className="flex flex-col gap-3">
+              {/* Show test card only once KYC is done and checkout reaches the payment phase */}
+              {order?.phase === "payment" && step === "options" && (
+                <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
+                  <CreditCard className="h-4 w-4 flex-shrink-0 text-gray-500" />
+                  <span className="text-xs text-gray-600">Test card:</span>
+                  <code className="text-xs font-medium text-gray-800">4242 4242 4242 4242</code>
+                  <CopyWrapper
+                    toCopy="4242424242424242"
+                    className="ml-auto text-xs text-gray-500 hover:text-gray-700"
+                  />
+                </div>
+              )}
               <div className="checkout-container overflow-hidden rounded-xl">
                 <CrossmintEmbeddedCheckout
                   orderId={orderId}
