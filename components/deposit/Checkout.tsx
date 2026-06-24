@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { CrossmintEmbeddedCheckout, useCrossmintCheckout } from "@crossmint/client-sdk-react-ui";
 import { CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -112,7 +112,6 @@ export function Checkout({
   const [clientSecret, setClientSecret] = useState<string>("");
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string>("");
-  const orderAmountRef = useRef<string>("");
 
   const handleCreateOrder = async () => {
     if (!amount || !isAmountValid || !receiptEmail || !walletAddress) return;
@@ -133,7 +132,6 @@ export function Checkout({
 
       setOrderId(result.data.order.orderId);
       setClientSecret(result.data.clientSecret);
-      orderAmountRef.current = amount;
     } catch (error) {
       console.error("Error creating order:", error);
       setOrderError(error instanceof Error ? error.message : "Failed to create order");
@@ -180,9 +178,9 @@ export function Checkout({
             </div>
           )}
           {orderId && clientSecret && !isCreatingOrder && (
-            <div className="flex flex-col gap-3">
+            <div>
               {step === "options" && (
-                <div className="flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
+                <div className="mb-4 flex w-full items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
                   <CreditCard className="h-4 w-4 flex-shrink-0 text-gray-500" />
                   <span className="text-xs text-gray-600">Test card:</span>
                   <code className="text-xs font-medium text-gray-800">4242 4242 4242 4242</code>
@@ -192,20 +190,18 @@ export function Checkout({
                   />
                 </div>
               )}
-              <div className="checkout-container overflow-hidden rounded-xl">
-                <CrossmintEmbeddedCheckout
-                  orderId={orderId}
-                  // @ts-ignore
-                  clientSecret={clientSecret}
-                  payment={{
-                    receiptEmail,
-                    crypto: { enabled: false },
-                    fiat: { enabled: true },
-                    defaultMethod: "fiat",
-                  }}
-                  appearance={CHECKOUT_APPEARANCE}
-                />
-              </div>
+              <CrossmintEmbeddedCheckout
+                orderId={orderId}
+                // @ts-ignore
+                clientSecret={clientSecret}
+                payment={{
+                  receiptEmail,
+                  crypto: { enabled: false },
+                  fiat: { enabled: true },
+                  defaultMethod: "fiat",
+                }}
+                appearance={CHECKOUT_APPEARANCE}
+              />
             </div>
           )}
         </div>
