@@ -91,11 +91,11 @@
 }
 
 .checkout-container {
-  min-height: 480px;
+  min-height: 620px;
   position: relative;
 }
 
 .checkout-container iframe {
   width: 100%;
-  min-height: 460px;
+  min-height: 600px;
 }
