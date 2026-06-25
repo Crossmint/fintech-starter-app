@@ -73,7 +73,7 @@ export function DepositModal({ open, onClose, walletAddress }: DepositModalProps
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="flex max-h-[90vh] min-h-[480px] sm:min-h-[700px] flex-col overflow-y-auto rounded-3xl bg-white sm:max-w-md">
+      <DialogContent className="flex max-h-[85vh] min-h-[580px] flex-col overflow-y-auto rounded-3xl bg-white sm:max-w-md">
         {showCloseButton && <DialogClose />}
         <DialogTitle className="text-center">{titleText}</DialogTitle>
         {step === "options" && !hasConfirmedAmount && (

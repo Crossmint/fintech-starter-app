@@ -190,7 +190,6 @@ export function Checkout({
                   />
                 </div>
               )}
-              <div className="checkout-container">
               <CrossmintEmbeddedCheckout
                 orderId={orderId}
                 // @ts-ignore
@@ -203,7 +202,6 @@ export function Checkout({
                 }}
                 appearance={CHECKOUT_APPEARANCE}
               />
-              </div>
             </div>
           )}
         </div>

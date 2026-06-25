@@ -89,13 +89,3 @@
     cursor: pointer;
   }
 }
-
-.checkout-container {
-  min-height: 620px;
-  position: relative;
-}
-
-.checkout-container iframe {
-  width: 100%;
-  min-height: 600px;
-}
