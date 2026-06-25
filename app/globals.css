@@ -90,35 +90,12 @@
   }
 }
 
-/* Always show a visible scrollbar in the deposit modal */
-[data-slot="dialog"] [data-state] {
-  scrollbar-width: thin;
-  scrollbar-color: #c4c4c4 transparent;
-}
-
-[data-slot="dialog"] [data-state]::-webkit-scrollbar {
-  width: 6px;
-}
-
-[data-slot="dialog"] [data-state]::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-[data-slot="dialog"] [data-state]::-webkit-scrollbar-thumb {
-  background-color: #c4c4c4;
-  border-radius: 3px;
-}
-
-[data-slot="dialog"] [data-state]::-webkit-scrollbar-thumb:hover {
-  background-color: #a0a0a0;
-}
-
 .checkout-container {
-  min-height: 380px;
+  min-height: 480px;
   position: relative;
 }
 
 .checkout-container iframe {
   width: 100%;
-  min-height: 360px;
+  min-height: 460px;
 }
