@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const LOADING_TIMEOUT_MS = 5000;
-const ESTIMATED_FEE_PERCENT = 0.035; // ~3.5% variable fee
-const ESTIMATED_FEE_FIXED = 0.3; // ~$0.30 fixed processing fee
+const ESTIMATED_FEE_PERCENT = 0.029; // ~2.9% variable fee (US debit baseline)
+const ESTIMATED_FEE_FIXED = 0.99; // ~$0.99 flat processing fee
 
 interface BreakdownElementProps {
   label: string;
