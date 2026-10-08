@@ -32,6 +32,9 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 - Automatically create non-custodial wallets for your users
 - Top up with USDC using a credit or debit card
 - Transfer USDC to another wallet or email address
+- Save contacts for one-tap Quick Send
+- Issue and fund a [Rain](https://rain.xyz) virtual card (base-sepolia only, requires `RAIN_API_KEY`)
+- Device signers for transaction approval
 - View your wallet activity
 - Withdraw USDC to your bank account
 - Support for +40 chains (Solana, EVM, etc)
@@ -46,7 +49,6 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 **Coming soon**
 
 - Currency conversion
-- Issue a debit card linked to your wallet
 
 Get in touch with us to get early access to these features!
 
@@ -117,6 +119,16 @@ NEXT_PUBLIC_CHAIN_ID=solana
 ```env
 # For solana 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
 NEXT_PUBLIC_USDC_MINT=your_USDC_mint
+```
+
+## Optional integrations
+
+```env
+# Rain virtual cards — only rendered when NEXT_PUBLIC_CHAIN_ID=base-sepolia
+RAIN_API_KEY=
+# HubSpot sign-in tracking — no-op unless set
+HUBSPOT_PRIVATE_APP_TOKEN=
+NEXT_PUBLIC_HUBSPOT_PORTAL_ID=
 ```
 
 ## Using in production

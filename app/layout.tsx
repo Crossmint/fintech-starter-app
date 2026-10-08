@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/app/providers";
 
@@ -29,6 +30,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} bg-muted box-content antialiased`}
       >
         <Providers>{children}</Providers>
+        {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
+          <Script
+            id="hs-script-loader"
+            src={`//js.hs-scripts.com/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}.js`}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

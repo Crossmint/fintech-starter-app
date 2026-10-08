@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import { AmountInput } from "../common/AmountInput";
 import { OrderPreview } from "./OrderPreview";
@@ -12,9 +12,10 @@ import { ArrowLeft, X } from "lucide-react";
 interface SendFundsModalProps {
   open: boolean;
   onClose: () => void;
+  initialRecipient?: string;
 }
 
-export function SendFundsModal({ open, onClose }: SendFundsModalProps) {
+export function SendFundsModal({ open, onClose, initialRecipient }: SendFundsModalProps) {
   const { wallet } = useWallet();
   const { user } = useCrossmintAuth();
   const [recipient, setRecipient] = useState("");
@@ -24,6 +25,10 @@ export function SendFundsModal({ open, onClose }: SendFundsModalProps) {
   const [error, setError] = useState<string | null>(null);
   const { displayableBalance, refetch: refetchBalance } = useBalance();
   const { refetch: refetchActivityFeed } = useActivityFeed();
+
+  useEffect(() => {
+    if (open && initialRecipient) setRecipient(initialRecipient);
+  }, [open, initialRecipient]);
 
   const isRecipientValid = isValidAddress(recipient) || isEmail(recipient);
   const isAmountValid =
