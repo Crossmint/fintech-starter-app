@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Deprecated: this app was consolidated into the Neobank Solution demo.
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        destination: "https://neobank-solution.demos-crossmint.com/",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

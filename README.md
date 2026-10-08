@@ -1,3 +1,9 @@
+> [!WARNING]
+>
+> **This repository is deprecated and no longer maintained.**
+>
+> Its features (wallets, onramp, send to address or email, activity, yield and configurable chains) now live in the **Neobank Solution** sample app: [neobank-solution.demos-crossmint.com](https://neobank-solution.demos-crossmint.com/). For onramp and offramp, see the Fintech sample app on [crossmint.com/quickstarts](https://crossmint.com/quickstarts).
+
 <div align="center">
 <img width="200" alt="Image" src="https://github.com/user-attachments/assets/8b617791-cd37-4a5a-8695-a7c9018b7c70" />
 <br>
