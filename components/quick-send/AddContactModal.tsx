@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "../common/Dialog";
 import { isEmail, isValidAddress } from "@/lib/utils";
-import type { Contact } from "./QuickSendCard";
+
+export interface Contact {
+  id: string;
+  name: string;
+  address: string;
+}
+
+export function formatRecipient(value: string): string {
+  return isEmail(value) ? value : `${value.slice(0, 6)}...${value.slice(-4)}`;
+}
 
 interface AddContactModalProps {
   open: boolean;

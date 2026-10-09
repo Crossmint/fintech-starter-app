@@ -16,6 +16,7 @@ interface NewProductProps {
 interface NewProductsProps {
   onEarnYieldClick?: () => void;
   onCardClick?: () => void;
+  hasCard?: boolean;
 }
 
 const NewProduct = ({ title, description, image, onClick, isActive }: NewProductProps) => {
@@ -55,7 +56,7 @@ const NewProduct = ({ title, description, image, onClick, isActive }: NewProduct
   );
 };
 
-export function NewProducts({ onEarnYieldClick, onCardClick }: NewProductsProps) {
+export function NewProducts({ onEarnYieldClick, onCardClick, hasCard }: NewProductsProps) {
   const { bestApy } = useYields();
 
   // Format APY for display
@@ -64,8 +65,10 @@ export function NewProducts({ onEarnYieldClick, onCardClick }: NewProductsProps)
   const newProducts: (NewProductProps & { id: string })[] = [
     {
       id: "card",
-      title: "Get your card",
-      description: "Set up a card to start using your funds",
+      title: hasCard ? "Your card" : "Get your card",
+      description: hasCard
+        ? "View, fund and manage your Rain card"
+        : "Set up a card to start using your funds",
       image: "/credit-card.png",
       onClick: onCardClick,
       isActive: CARDS_ENABLED,

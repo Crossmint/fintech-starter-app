@@ -46,21 +46,25 @@ interface CardData {
 
 interface RainCardFlowProps {
   showManage?: boolean;
-  onShowManage?: () => void;
   onCloseManage?: () => void;
+  onCardStatusChange?: (hasCard: boolean) => void;
 }
 
 const CREDIT_BALANCE_POLL_INTERVAL_MS = 10_000;
 
 export default function RainCardFlow({
   showManage,
-  onShowManage,
+  onCardStatusChange,
   onCloseManage,
 }: RainCardFlowProps) {
   const { wallet } = useWallet();
   const { user } = useCrossmintAuth();
 
   const [step, setStep] = useState<FlowStep>("signup");
+
+  useEffect(() => {
+    onCardStatusChange?.(step === "card-issued");
+  }, [step, onCardStatusChange]);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [rainUserId, setRainUserId] = useState("");
@@ -345,162 +349,6 @@ export default function RainCardFlow({
               </p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  /* ─── Sidebar Card ─── */
-  const sidebarCard = (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-none lg:shadow-[0_4px_24px_-4px_rgba(16,24,40,0.08),0_2px_8px_-2px_rgba(16,24,40,0.03)]">
-      <div className="flex items-center justify-between border-b border-gray-100/80 px-4 py-4 lg:px-6 lg:py-5">
-        <h2 className="text-[15px] font-semibold text-gray-800 lg:text-base">Cards</h2>
-        {step !== "card-issued" && (
-          <div className="flex items-center gap-1.5">
-            {STEPS.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                  i < currentStepIndex
-                    ? "bg-emerald-500"
-                    : i === currentStepIndex
-                      ? "bg-gray-800"
-                      : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="p-4">
-        {initialLoading && (
-          <div className="flex items-center justify-center py-6">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-          </div>
-        )}
-
-        {!initialLoading && step === "signup" && (
-          <div>
-            <div className="mb-3 rounded-xl border border-gray-100 bg-gray-50 p-3">
-              <p className="mb-1 text-xs font-medium text-gray-600">Rain Virtual Visa</p>
-              <p className="text-xs text-gray-400">
-                Apply for a virtual card. Uses test KYC data for demo.
-              </p>
-            </div>
-            <button
-              onClick={handleApply}
-              disabled={isLoading || !walletEmail}
-              className="w-full rounded-xl bg-gray-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Applying...
-                </span>
-              ) : (
-                "Apply for Card"
-              )}
-            </button>
-          </div>
-        )}
-
-        {!initialLoading && step === "contract-created" && (
-          <div>
-            <div className="mb-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3">
-              <p className="mb-1 text-xs font-medium text-emerald-700">Contract Ready</p>
-              <p className="font-mono text-xs text-emerald-600">
-                {contractAddress?.slice(0, 6)}...{contractAddress?.slice(-4)}
-              </p>
-            </div>
-            <button
-              onClick={handleIssueCard}
-              disabled={isLoading}
-              className="w-full rounded-xl bg-gray-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Issuing...
-                </span>
-              ) : (
-                "Issue Virtual Card"
-              )}
-            </button>
-          </div>
-        )}
-
-        {!initialLoading && step === "card-issued" && cardData && (
-          <div>
-            <CardVisual className="aspect-[1.6/1]" />
-            <div className="mb-3 mt-3 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-800">Virtual Visa</p>
-                <p className="text-xs text-gray-400">•••• {last4}</p>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs font-medium text-emerald-600">Active</span>
-              </div>
-            </div>
-            {creditBalances && (
-              <div className="mb-3 flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
-                <div className="flex-1">
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400">
-                    Spending Power
-                  </p>
-                  <p className="text-sm font-semibold text-gray-800">
-                    ${creditBalances.spendingPower.toFixed(2)}
-                  </p>
-                </div>
-                <div className="h-8 w-px bg-gray-200" />
-                <div className="flex-1">
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400">Credit Limit</p>
-                  <p className="text-sm font-semibold text-gray-800">
-                    ${creditBalances.creditLimit.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            )}
-            <button
-              onClick={onShowManage}
-              className="w-full rounded-xl bg-gray-100 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
-            >
-              Manage Card
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Other providers */}
-      <div className="space-y-2 px-4 pb-4">
-        <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-200">
-              <CreditCard size={16} className="text-gray-400" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-700">WireX</p>
-              <p className="text-[10px] text-gray-400">Crypto-friendly debit card</p>
-            </div>
-          </div>
-          <span className="rounded-full bg-gray-100 px-2 py-1 text-[10px] font-medium text-gray-400">
-            Coming Soon
-          </span>
-        </div>
-        <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-200">
-              <CreditCard size={16} className="text-gray-400" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-700">Kulipa</p>
-              <p className="text-[10px] text-gray-400">Virtual card platform</p>
-            </div>
-          </div>
-          <span className="rounded-full bg-gray-100 px-2 py-1 text-[10px] font-medium text-gray-400">
-            Coming Soon
-          </span>
         </div>
       </div>
     </div>
@@ -876,7 +724,6 @@ export default function RainCardFlow({
 
   return (
     <>
-      {sidebarCard}
       {preCardModal}
       {manageModal}
     </>
