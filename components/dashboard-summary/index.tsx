@@ -63,40 +63,46 @@ export function DashboardSummary({
       <Container className="flex w-full max-w-5xl flex-col items-center justify-between md:flex-row md:items-center">
         <WalletBalance />
         <div className="flex w-full items-center gap-3 md:w-auto md:justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="flex h-11 flex-grow items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 text-sm font-medium text-gray-900 transition hover:bg-gray-50 md:w-32 md:flex-grow-0"
-              >
-                <ArrowUpRight className="h-4 w-4" /> Send
-                <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64 bg-white">
-              <DropdownMenuItem onSelect={onSendClick}>
-                <ArrowUpRight className="h-4 w-4" /> New transfer
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs text-gray-500">Quick Send</DropdownMenuLabel>
-              {contacts.map((contact) => (
-                <DropdownMenuItem key={contact.id} onSelect={() => onSelectContact(contact)}>
-                  <div className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
-                    {contact.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm text-gray-900">{contact.name}</span>
-                    <span className="truncate text-xs text-gray-500">
-                      {formatRecipient(contact.address)}
-                    </span>
-                  </div>
+          <div className="flex h-11 flex-grow overflow-hidden rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-900 md:flex-grow-0">
+            <button
+              type="button"
+              className="flex flex-grow items-center justify-center gap-2 pl-5 pr-3 transition hover:bg-gray-50"
+              onClick={onSendClick}
+            >
+              <ArrowUpRight className="h-4 w-4" /> Send
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Quick Send"
+                  className="flex items-center border-l border-gray-200 pl-2 pr-3 transition hover:bg-gray-50"
+                >
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64 bg-white">
+                <DropdownMenuLabel className="text-xs text-gray-500">Quick Send</DropdownMenuLabel>
+                {contacts.map((contact) => (
+                  <DropdownMenuItem key={contact.id} onSelect={() => onSelectContact(contact)}>
+                    <div className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
+                      {contact.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex min-w-0 flex-col">
+                      <span className="truncate text-sm text-gray-900">{contact.name}</span>
+                      <span className="truncate text-xs text-gray-500">
+                        {formatRecipient(contact.address)}
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+                {contacts.length > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuItem onSelect={onAddContact}>
+                  <UserPlus className="h-4 w-4" /> Add contact
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuItem onSelect={onAddContact}>
-                <UserPlus className="h-4 w-4" /> Add contact
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <DepositButton onClick={onDepositClick} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
