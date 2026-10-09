@@ -1,13 +1,14 @@
 import { useState } from "react";
 import Image from "next/image";
-import { useCrossmintAuth } from "@crossmint/client-sdk-react-ui";
+import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import { DepositModal } from "@/components/deposit";
 import { SendFundsModal } from "@/components/send-funds";
 import { EarnYieldModal } from "@/components/earn-yield";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { NewProducts } from "./NewProducts";
 import { DashboardSummary } from "./dashboard-summary";
-import { AddContactModal, type Contact } from "./quick-send/AddContactModal";
+import { AddContactModal } from "./quick-send/AddContactModal";
+import { useContacts } from "@/hooks/useContacts";
 import RainCardFlow from "./cards/RainCardFlow";
 import { CARDS_ENABLED } from "@/lib/config";
 
@@ -22,7 +23,8 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
   const [showAddContact, setShowAddContact] = useState(false);
   const [showCardManage, setShowCardManage] = useState(false);
   const [hasCard, setHasCard] = useState(false);
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const { wallet } = useWallet();
+  const { contacts, addContact } = useContacts(wallet?.address);
   const [sendRecipient, setSendRecipient] = useState<string | undefined>();
   const { logout } = useCrossmintAuth();
 
@@ -85,7 +87,7 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
         <AddContactModal
           open={showAddContact}
           onClose={() => setShowAddContact(false)}
-          onAdd={(contact) => setContacts((prev) => [...prev, contact])}
+          onAdd={addContact}
         />
         <EarnYieldModal open={showEarnYieldModal} onClose={() => setShowEarnYieldModal(false)} />
       </div>

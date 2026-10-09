@@ -32,7 +32,7 @@ Create your own Fintech app in minutes using **[Crossmint](https://crossmint.com
 - Automatically create non-custodial wallets for your users
 - Top up with USDC using a credit or debit card
 - Transfer USDC to another wallet or email address
-- Save contacts for one-tap Quick Send
+- Save contacts for one-tap Quick Send (persisted per wallet in localStorage)
 - Issue and fund a [Rain](https://rain.xyz) virtual card (base-sepolia only, requires `RAIN_API_KEY`)
 - Device signers for transaction approval
 - View your wallet activity
