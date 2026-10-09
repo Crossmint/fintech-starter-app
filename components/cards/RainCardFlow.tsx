@@ -231,14 +231,21 @@ export default function RainCardFlow({
         displayName: walletEmail,
         status: "active",
       });
-      setCardData({
+      let issued: CardData = {
         id: card.cardId,
         type: card.type,
         status: card.status,
         limit: card.limit,
         last4: card.lastFour,
         displayName: card.displayName,
-      });
+      };
+      // The issue response can omit lastFour; the card list has it.
+      if (!issued.last4) {
+        const cards = await getRainUserCards(rainUserId).catch(() => []);
+        const listed = cards.find((c: CardData) => c.id === issued.id) ?? cards[0];
+        if (listed) issued = { ...issued, ...listed };
+      }
+      setCardData(issued);
       await refreshCreditBalances();
       setStep("card-issued");
     } catch (err) {
