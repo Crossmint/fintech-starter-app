@@ -1,12 +1,16 @@
 import { useState } from "react";
 import Image from "next/image";
-import { useCrossmintAuth } from "@crossmint/client-sdk-react-ui";
+import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import { DepositModal } from "@/components/deposit";
 import { SendFundsModal } from "@/components/send-funds";
 import { EarnYieldModal } from "@/components/earn-yield";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { NewProducts } from "./NewProducts";
 import { DashboardSummary } from "./dashboard-summary";
+import { AddContactModal } from "./quick-send/AddContactModal";
+import { useContacts } from "@/hooks/useContacts";
+import RainCardFlow from "./cards/RainCardFlow";
+import { CARDS_ENABLED } from "@/lib/config";
 
 interface MainScreenProps {
   walletAddress?: string;
@@ -16,6 +20,12 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showEarnYieldModal, setShowEarnYieldModal] = useState(false);
+  const [showAddContact, setShowAddContact] = useState(false);
+  const [showCardManage, setShowCardManage] = useState(false);
+  const [hasCard, setHasCard] = useState(false);
+  const { wallet } = useWallet();
+  const { contacts, addContact } = useContacts(wallet?.address);
+  const [sendRecipient, setSendRecipient] = useState<string | undefined>();
   const { logout } = useCrossmintAuth();
 
   return (
@@ -41,15 +51,44 @@ export function MainScreen({ walletAddress }: MainScreenProps) {
         <DashboardSummary
           onDepositClick={() => setShowDepositModal(true)}
           onSendClick={() => setShowSendModal(true)}
+          contacts={contacts}
+          onSelectContact={(contact) => {
+            setSendRecipient(contact.address);
+            setShowSendModal(true);
+          }}
+          onAddContact={() => setShowAddContact(true)}
         />
-        <NewProducts onEarnYieldClick={() => setShowEarnYieldModal(true)} />
+        <NewProducts
+          onEarnYieldClick={() => setShowEarnYieldModal(true)}
+          onCardClick={() => setShowCardManage(true)}
+          hasCard={hasCard}
+        />
         <ActivityFeed />
         <DepositModal
           open={showDepositModal}
           onClose={() => setShowDepositModal(false)}
           walletAddress={walletAddress || ""}
         />
-        <SendFundsModal open={showSendModal} onClose={() => setShowSendModal(false)} />
+        <SendFundsModal
+          open={showSendModal}
+          initialRecipient={sendRecipient}
+          onClose={() => {
+            setShowSendModal(false);
+            setSendRecipient(undefined);
+          }}
+        />
+        {CARDS_ENABLED && (
+          <RainCardFlow
+            showManage={showCardManage}
+            onCloseManage={() => setShowCardManage(false)}
+            onCardStatusChange={setHasCard}
+          />
+        )}
+        <AddContactModal
+          open={showAddContact}
+          onClose={() => setShowAddContact(false)}
+          onAdd={addContact}
+        />
         <EarnYieldModal open={showEarnYieldModal} onClose={() => setShowEarnYieldModal(false)} />
       </div>
     </div>

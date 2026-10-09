@@ -4,12 +4,22 @@ import { Login } from "@/components/Login";
 import { MainScreen } from "@/components/MainScreen";
 import { useCrossmintAuth, useWallet } from "@crossmint/client-sdk-react-ui";
 import { useProcessWithdrawal } from "@/hooks/useProcessWithdrawal";
+import { hubspotIdentify } from "@/server-actions/hubspotIdentify";
+import { useEffect, useRef } from "react";
 
 export function HomeContent() {
   const { wallet, status: walletStatus } = useWallet();
-  const { status, status: authStatus, user } = useCrossmintAuth();
+  const { status, status: authStatus, user, jwt } = useCrossmintAuth();
 
   useProcessWithdrawal(user?.id, wallet);
+
+  const identifiedRef = useRef(false);
+  useEffect(() => {
+    if (status === "logged-in" && jwt && !identifiedRef.current) {
+      identifiedRef.current = true;
+      hubspotIdentify(jwt).catch(() => {});
+    }
+  }, [status, jwt]);
 
   const walletAddress = wallet?.address;
   const isLoggedIn = wallet != null && status === "logged-in";
