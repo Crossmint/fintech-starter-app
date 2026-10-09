@@ -8,10 +8,10 @@ import {
   createRainUserApplication,
   createRainUserContract,
   getDecryptedCardData,
-  getRainUserByWalletAddress,
   getRainUserCards,
   getRainUserContracts,
   getRainUserCreditBalances,
+  getMyRainUsers,
   issueRainCard,
 } from "@/server-actions/rain";
 
@@ -58,7 +58,7 @@ export default function RainCardFlow({
   onCloseManage,
 }: RainCardFlowProps) {
   const { wallet } = useWallet();
-  const { user } = useCrossmintAuth();
+  const { user, jwt } = useCrossmintAuth();
 
   const [step, setStep] = useState<FlowStep>("signup");
 
@@ -95,10 +95,10 @@ export default function RainCardFlow({
 
   useEffect(() => {
     const determineCurrentStep = async () => {
-      if (!wallet?.address || !walletEmail) return;
+      if (!wallet?.address || !walletEmail || !jwt) return;
       setInitialLoading(true);
       try {
-        const existingUsers = await getRainUserByWalletAddress(wallet.address);
+        const existingUsers = await getMyRainUsers(jwt);
         if (existingUsers.length === 0) {
           setStep("signup");
           return;
@@ -108,12 +108,12 @@ export default function RainCardFlow({
         setRainUserId(u.id);
 
         try {
-          const contractInfo = await getRainUserContracts(u.id);
+          const contractInfo = await getRainUserContracts(jwt, u.id);
           setContractAddress(contractInfo?.depositAddress);
           setContractData(contractInfo);
 
           try {
-            const cards = await getRainUserCards(u.id);
+            const cards = await getRainUserCards(jwt, u.id);
             if (cards.length > 0) {
               setCardData(cards[0]);
               setStep("card-issued");
@@ -126,8 +126,8 @@ export default function RainCardFlow({
           }
         } catch {
           try {
-            await createRainUserContract(u.id, BASE_SEPOLIA_CHAIN_ID);
-            const newContract = await getRainUserContracts(u.id);
+            await createRainUserContract(jwt, u.id, BASE_SEPOLIA_CHAIN_ID);
+            const newContract = await getRainUserContracts(jwt, u.id);
             setContractAddress(newContract?.depositAddress);
             setContractData(newContract);
             setStep("contract-created");
@@ -142,13 +142,13 @@ export default function RainCardFlow({
       }
     };
     determineCurrentStep();
-  }, [wallet?.address, walletEmail]);
+  }, [wallet?.address, walletEmail, jwt]);
 
   const refreshCreditBalances = async (userId?: string) => {
     const id = userId || rainUserId;
     if (!id) return;
     try {
-      const balances = await getRainUserCreditBalances(id);
+      const balances = await getRainUserCreditBalances(jwt, id);
       setCreditBalances(balances);
     } catch (err) {
       console.error("Failed to refresh credit balances:", err);
@@ -170,7 +170,7 @@ export default function RainCardFlow({
     if (!rainUserId) return;
     setIsRefreshing(true);
     try {
-      const updated = await getRainUserContracts(rainUserId);
+      const updated = await getRainUserContracts(jwt, rainUserId);
       setContractData(updated);
       await refreshCreditBalances();
     } catch (err) {
@@ -184,7 +184,7 @@ export default function RainCardFlow({
     if (!wallet || !walletEmail) return;
     setIsLoading(true);
     try {
-      const result = await createRainUserApplication({
+      const result = await createRainUserApplication(jwt, {
         firstName: walletEmail,
         lastName: "approved",
         birthDate: "1990-01-01",
@@ -205,12 +205,11 @@ export default function RainCardFlow({
         accountPurpose: "personal",
         expectedMonthlyVolume: "2000",
         isTermsOfServiceAccepted: true,
-        walletAddress: wallet.address,
       });
       setRainUserId(result.userId);
       await new Promise((r) => setTimeout(r, 5000));
-      await createRainUserContract(result.userId, BASE_SEPOLIA_CHAIN_ID);
-      const contractInfo = await getRainUserContracts(result.userId);
+      await createRainUserContract(jwt, result.userId, BASE_SEPOLIA_CHAIN_ID);
+      const contractInfo = await getRainUserContracts(jwt, result.userId);
       setContractAddress(contractInfo?.depositAddress);
       setContractData(contractInfo);
       setStep("contract-created");
@@ -225,7 +224,7 @@ export default function RainCardFlow({
     if (!rainUserId) return;
     setIsLoading(true);
     try {
-      const card = await issueRainCard(rainUserId, {
+      const card = await issueRainCard(jwt, rainUserId, {
         type: "virtual",
         limit: { frequency: "allTime", amount: 1000 },
         displayName: walletEmail,
@@ -241,7 +240,7 @@ export default function RainCardFlow({
       };
       // The issue response can omit lastFour; the card list has it.
       if (!issued.last4) {
-        const cards = await getRainUserCards(rainUserId).catch(() => []);
+        const cards = await getRainUserCards(jwt, rainUserId).catch(() => []);
         const listed = cards.find((c: CardData) => c.id === issued.id) ?? cards[0];
         if (listed) issued = { ...issued, ...listed };
       }
@@ -295,7 +294,7 @@ export default function RainCardFlow({
       });
       if (rainUserId) {
         await new Promise((r) => setTimeout(r, 3000));
-        const updated = await getRainUserContracts(rainUserId);
+        const updated = await getRainUserContracts(jwt, rainUserId);
         setContractData(updated);
         await refreshCreditBalances();
       }
@@ -311,7 +310,7 @@ export default function RainCardFlow({
     if (!cardData?.id) return;
     setIsRevealing(true);
     try {
-      const decrypted = await getDecryptedCardData(cardData.id);
+      const decrypted = await getDecryptedCardData(jwt, cardData.id);
       setDecryptedCardData(decrypted);
       setShowCardDetails(true);
     } catch (err) {

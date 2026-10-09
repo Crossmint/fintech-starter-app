@@ -1,5 +1,7 @@
 "use server";
 
+import { verifyCaller } from "@/lib/verifyCaller";
+
 const HS_API = "https://api.hubapi.com";
 
 function hsHeaders(token: string) {
@@ -9,14 +11,15 @@ function hsHeaders(token: string) {
   };
 }
 
-export async function hubspotIdentify({ email }: { email: string }): Promise<{ ok: boolean }> {
+export async function hubspotIdentify(jwt: string | undefined): Promise<{ ok: boolean }> {
   try {
-    if (!email || typeof email !== "string") {
+    const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
+    if (!token) {
       return { ok: false };
     }
 
-    const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
-    if (!token) {
+    const { email } = await verifyCaller(jwt);
+    if (!email) {
       return { ok: false };
     }
 
@@ -33,7 +36,6 @@ export async function hubspotIdentify({ email }: { email: string }): Promise<{ o
         headers,
         body: JSON.stringify({
           properties: {
-            inbound_source: "Demo - Fintech",
             inbound_note: `Signed into fintech-starter-app at ${now}`,
           },
         }),

@@ -9,17 +9,17 @@ import { useEffect, useRef } from "react";
 
 export function HomeContent() {
   const { wallet, status: walletStatus } = useWallet();
-  const { status, status: authStatus, user } = useCrossmintAuth();
+  const { status, status: authStatus, user, jwt } = useCrossmintAuth();
 
   useProcessWithdrawal(user?.id, wallet);
 
   const identifiedRef = useRef(false);
   useEffect(() => {
-    if (status === "logged-in" && user?.email && !identifiedRef.current) {
+    if (status === "logged-in" && jwt && !identifiedRef.current) {
       identifiedRef.current = true;
-      hubspotIdentify({ email: user.email }).catch(() => {});
+      hubspotIdentify(jwt).catch(() => {});
     }
-  }, [status, user?.email]);
+  }, [status, jwt]);
 
   const walletAddress = wallet?.address;
   const isLoggedIn = wallet != null && status === "logged-in";

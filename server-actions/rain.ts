@@ -2,6 +2,7 @@
 
 import { BASE_SEPOLIA_CHAIN_ID, RUSD_CONTRACT_ADDRESS } from "@/lib/config";
 import crypto from "crypto";
+import { verifyCaller } from "@/lib/verifyCaller";
 
 interface RainConsumerApplication {
   firstName: string;
@@ -24,7 +25,6 @@ interface RainConsumerApplication {
   accountPurpose: string;
   expectedMonthlyVolume: string;
   isTermsOfServiceAccepted: true;
-  walletAddress: string;
 }
 
 interface RainCardRequest {
@@ -77,11 +77,41 @@ function rainHeaders(json = false) {
   return headers;
 }
 
-export async function createRainUserApplication(params: RainConsumerApplication) {
+async function assertOwnsRainUser(jwt: string | undefined, userId: string) {
+  const { walletAddress } = await verifyCaller(jwt);
+  const response = await fetch(`${RAIN_API_URL}/issuing/users/${encodeURIComponent(userId)}`, {
+    headers: rainHeaders(),
+  });
+  if (!response.ok) throw new Error("Unauthorized");
+  const user = await response.json();
+  if (user?.walletAddress?.toLowerCase() !== walletAddress.toLowerCase()) {
+    throw new Error("Unauthorized");
+  }
+}
+
+function withKycRedirectUrl(user: RainUser): RainUser {
+  const link = user.applicationExternalVerificationLink;
+  return link
+    ? {
+        ...user,
+        kycRedirectUrl: `${link.url}?userId=${link.params.userId}&signature=${link.params.signature}`,
+      }
+    : user;
+}
+
+export async function createRainUserApplication(
+  jwt: string | undefined,
+  params: RainConsumerApplication
+) {
+  const caller = await verifyCaller(jwt);
   const response = await fetch(`${RAIN_API_URL}/issuing/applications/user`, {
     method: "POST",
     headers: rainHeaders(true),
-    body: JSON.stringify(params),
+    body: JSON.stringify({
+      ...params,
+      email: caller.email ?? params.email,
+      walletAddress: caller.walletAddress,
+    }),
   });
 
   if (!response.ok) {
@@ -89,59 +119,35 @@ export async function createRainUserApplication(params: RainConsumerApplication)
     throw new Error(`Rain application failed: ${error.message || response.statusText}`);
   }
 
-  const result = await response.json();
-  let kycRedirectUrl = "";
-  if (result.applicationExternalVerificationLink) {
-    const link = result.applicationExternalVerificationLink;
-    kycRedirectUrl = `${link.url}?userId=${link.params.userId}&signature=${link.params.signature}`;
-  }
-
+  const result = withKycRedirectUrl(await response.json());
   return {
     userId: result.id,
     applicationStatus: result.applicationStatus,
     email: result.email,
     walletAddress: result.walletAddress,
-    kycRedirectUrl,
+    kycRedirectUrl: result.kycRedirectUrl ?? "",
   };
 }
 
-export async function getRainUserStatus(userId: string) {
-  const response = await fetch(`${RAIN_API_URL}/issuing/applications/user/${userId}`, {
-    headers: rainHeaders(),
-  });
-
-  if (!response.ok) throw new Error(`Failed to get user status: ${response.statusText}`);
-  const result = await response.json();
-
-  return {
-    userId: result.id,
-    applicationStatus: result.applicationStatus,
-    firstName: result.firstName,
-    lastName: result.lastName,
-    email: result.email,
-    walletAddress: result.walletAddress,
-    isActive: result.isActive,
-  };
-}
-
-export async function getRainUserByWalletAddress(walletAddress: string) {
+export async function getMyRainUsers(jwt: string | undefined) {
+  const { walletAddress } = await verifyCaller(jwt);
   const response = await fetch(`${RAIN_API_URL}/issuing/users?limit=100`, {
     headers: rainHeaders(),
   });
 
   if (!response.ok) throw new Error(`Failed to get user by wallet: ${response.statusText}`);
-  const json = await response.json();
-  const filtered = json.filter((user: RainUser) => user.walletAddress === walletAddress);
-
-  if (filtered.length > 0 && filtered[0].applicationExternalVerificationLink) {
-    const link = filtered[0].applicationExternalVerificationLink;
-    filtered[0].kycRedirectUrl = `${link.url}?userId=${link.params.userId}&signature=${link.params.signature}`;
-  }
-
-  return filtered;
+  const json: RainUser[] = await response.json();
+  return json
+    .filter((user) => user.walletAddress?.toLowerCase() === walletAddress.toLowerCase())
+    .map(withKycRedirectUrl);
 }
 
-export async function createRainUserContract(userId: string, chainId: number) {
+export async function createRainUserContract(
+  jwt: string | undefined,
+  userId: string,
+  chainId: number
+) {
+  await assertOwnsRainUser(jwt, userId);
   await fetch(`${RAIN_API_URL}/issuing/users/${userId}/contracts`, {
     method: "POST",
     headers: rainHeaders(true),
@@ -149,7 +155,12 @@ export async function createRainUserContract(userId: string, chainId: number) {
   });
 }
 
-export async function getRainUserContracts(userId: string, maxRetries = 10) {
+export async function getRainUserContracts(
+  jwt: string | undefined,
+  userId: string,
+  maxRetries = 10
+) {
+  await assertOwnsRainUser(jwt, userId);
   const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -199,7 +210,12 @@ export async function getRainUserContracts(userId: string, maxRetries = 10) {
   throw new Error("Failed to get user contracts after all retries");
 }
 
-export async function issueRainCard(userId: string, cardParams: RainCardRequest) {
+export async function issueRainCard(
+  jwt: string | undefined,
+  userId: string,
+  cardParams: RainCardRequest
+) {
+  await assertOwnsRainUser(jwt, userId);
   const response = await fetch(`${RAIN_API_URL}/issuing/users/${userId}/cards`, {
     method: "POST",
     headers: rainHeaders(true),
@@ -217,12 +233,13 @@ export async function issueRainCard(userId: string, cardParams: RainCardRequest)
     status: result.status,
     type: result.type,
     limit: result.limit,
-    lastFour: result.lastFour,
+    lastFour: result.last4 ?? result.lastFour,
     displayName: result.displayName,
   };
 }
 
-export async function getRainUserCards(userId: string) {
+export async function getRainUserCards(jwt: string | undefined, userId: string) {
+  await assertOwnsRainUser(jwt, userId);
   const response = await fetch(`${RAIN_API_URL}/issuing/cards?userId=${userId}&limit=20`, {
     headers: rainHeaders(),
   });
@@ -230,7 +247,8 @@ export async function getRainUserCards(userId: string) {
   return response.json();
 }
 
-export async function getRainUserCreditBalances(userId: string) {
+export async function getRainUserCreditBalances(jwt: string | undefined, userId: string) {
+  await assertOwnsRainUser(jwt, userId);
   const response = await fetch(`${RAIN_API_URL}/issuing/users/${userId}/balances`, {
     headers: rainHeaders(),
   });
@@ -272,7 +290,14 @@ async function decryptSecret(base64Secret: string, base64Iv: string, secretKey: 
   return decrypted.toString("utf-8").trim();
 }
 
-export async function getDecryptedCardData(cardId: string) {
+export async function getDecryptedCardData(jwt: string | undefined, cardId: string) {
+  const cardResponse = await fetch(`${RAIN_API_URL}/issuing/cards/${encodeURIComponent(cardId)}`, {
+    headers: rainHeaders(),
+  });
+  if (!cardResponse.ok) throw new Error("Unauthorized");
+  const card = await cardResponse.json();
+  await assertOwnsRainUser(jwt, card?.userId);
+
   const { secretKey, sessionId } = await generateSessionId(RAIN_PUBLIC_KEY);
 
   const response = await fetch(`${RAIN_API_URL}/issuing/cards/${cardId}/secrets`, {
